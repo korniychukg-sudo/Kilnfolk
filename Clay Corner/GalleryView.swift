@@ -1,0 +1,345 @@
+import SwiftUI
+
+struct GalleryView: View {
+    @EnvironmentObject var store: ClayStore
+    @State private var filter: GalleryFilter = .all
+    @State private var selectedPotID: UUID? = nil
+
+    enum GalleryFilter: String, CaseIterable, Identifiable {
+        case all, favorites
+        var id: String { rawValue }
+        var label: String { self == .all ? "All pieces" : "Favorites" }
+    }
+
+    private var shownPots: [PotDesign] {
+        let pots = store.galleryPots
+        return filter == .all ? pots : pots.filter { $0.favorite }
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            let columns = geo.size.width > 700 ? 4 : 3
+            ZStack {
+                Studio.cream.ignoresSafeArea()
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 16) {
+                        CornerArt(name: "gallery_banner")
+                            .scaledToFill()
+                            .frame(height: 150)
+                            .frame(maxWidth: .infinity)
+                            .clipped()
+                            .cornerRadius(22)
+                            .overlay(
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("The Gallery")
+                                        .font(.clayTitle(26))
+                                        .foregroundColor(.white)
+                                    Text("Every piece you have fired")
+                                        .font(.clayBody(13))
+                                        .foregroundColor(.white.opacity(0.85))
+                                }
+                                .padding(14)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                                .background(
+                                    LinearGradient(colors: [.clear, .black.opacity(0.45)],
+                                                   startPoint: .center, endPoint: .bottom)
+                                )
+                                .cornerRadius(22)
+                            )
+
+                        HStack(spacing: 10) {
+                            statChip(value: store.stats.fired, word: "fired")
+                            statChip(value: store.galleryPots.filter { $0.favorite }.count, word: "loved")
+                            statChip(value: store.galleryPots.filter { $0.crackle }.count, word: "crackled")
+                            Spacer()
+                        }
+
+                        filterPicker
+
+                        if shownPots.isEmpty {
+                            emptyState
+                        } else {
+                            shelves(columns: columns)
+                        }
+                    }
+                    .padding(.horizontal, 18)
+                    .padding(.top, 12)
+                    .padding(.bottom, 24)
+                    .clayReadable()
+                }
+            }
+        }
+        .sheet(item: Binding(
+            get: { selectedPotID.flatMap { store.pot($0) } },
+            set: { if $0 == nil { selectedPotID = nil } }
+        )) { pot in
+            PotDetailSheet(potID: pot.id) { selectedPotID = nil }
+                .environmentObject(store)
+        }
+    }
+
+    private func statChip(value: Int, word: String) -> some View {
+        HStack(spacing: 5) {
+            Text("\(value)")
+                .font(.clayBody(15, .bold))
+                .foregroundColor(Studio.ink)
+            Text(word)
+                .font(.clayBody(12))
+                .foregroundColor(Studio.inkSoft)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(Capsule().fill(Studio.card))
+    }
+
+    private var filterPicker: some View {
+        HStack(spacing: 4) {
+            ForEach(GalleryFilter.allCases) { f in
+                let selected = filter == f
+                Button(action: { filter = f }) {
+                    Text(f.label)
+                        .font(.clayBody(13, .bold))
+                        .foregroundColor(selected ? .white : Studio.inkSoft)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Capsule().fill(selected ? Studio.terracotta : Color.clear))
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+        }
+        .padding(4)
+        .background(Capsule().fill(Studio.card))
+    }
+
+    private var emptyState: some View {
+        ClayCard {
+            VStack(spacing: 10) {
+                CornerArt(name: "gallery_empty")
+                    .scaledToFit()
+                    .frame(height: 140)
+                    .cornerRadius(16)
+                Text(filter == .favorites ? "No favorites yet" : "The shelf is waiting")
+                    .font(.clayBody(16, .bold))
+                    .foregroundColor(Studio.ink)
+                Text(filter == .favorites
+                     ? "Tap the star on a piece you love and it will live here."
+                     : "Fire your first piece and it will take pride of place right here.")
+                    .font(.clayBody(13))
+                    .foregroundColor(Studio.inkSoft)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    // MARK: Shelves
+
+    private func shelves(columns: Int) -> some View {
+        let rows: [[PotDesign]] = stride(from: 0, to: shownPots.count, by: columns).map {
+            Array(shownPots[$0..<min($0 + columns, shownPots.count)])
+        }
+        return VStack(spacing: 22) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                shelfRow(row, columns: columns)
+            }
+        }
+    }
+
+    private func shelfRow(_ row: [PotDesign], columns: Int) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .bottom, spacing: 10) {
+                ForEach(row) { pot in
+                    shelfPot(pot)
+                }
+                // keep grid alignment when the last row is short
+                ForEach(0..<(columns - row.count), id: \.self) { _ in
+                    Color.clear.frame(maxWidth: .infinity).frame(height: 10)
+                }
+            }
+            .padding(.horizontal, 8)
+            CornerArt(name: "wood_shelf", fallback: Studio.wood)
+                .frame(height: 16)
+                .frame(maxWidth: .infinity)
+                .cornerRadius(4)
+                .shadow(color: Studio.shadow, radius: 5, x: 0, y: 4)
+        }
+    }
+
+    private func shelfPot(_ pot: PotDesign) -> some View {
+        Button(action: { selectedPotID = pot.id }) {
+            VStack(spacing: 4) {
+                ZStack(alignment: .topTrailing) {
+                    PotFigure(pot: pot, phase: Double(pot.artSeed % 7), wet: false, showShadow: true)
+                        .frame(height: 106)
+                        .frame(maxWidth: .infinity)
+                    if pot.favorite {
+                        ClayIcon(kind: .starFill, size: 15, color: Studio.honey)
+                            .padding(3)
+                    }
+                }
+                Text(pot.displayName)
+                    .font(.clayBody(11, .bold))
+                    .foregroundColor(Studio.inkSoft)
+                    .lineLimit(1)
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+        .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - Detail sheet
+
+struct PotDetailSheet: View {
+    @EnvironmentObject var store: ClayStore
+    let potID: UUID
+    let onClose: () -> Void
+
+    @State private var spinPhase: Double = 0
+    @State private var lastDragX: CGFloat? = nil
+    @State private var editingName = ""
+    @State private var nameLoaded = false
+    @State private var confirmDelete = false
+
+    var body: some View {
+        ZStack {
+            Studio.cream.ignoresSafeArea()
+            if let pot = store.pot(potID) {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 16) {
+                        HStack {
+                            Spacer()
+                            Button(action: onClose) {
+                                ClayIcon(kind: .close, size: 17, color: Studio.ink)
+                                    .padding(9)
+                                    .background(Circle().fill(Studio.card))
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        .padding(.top, 14)
+
+                        PotFigure(pot: pot, phase: spinPhase, wet: false)
+                            .frame(height: 260)
+                            .frame(maxWidth: 300)
+                            .contentShape(Rectangle())
+                            .gesture(
+                                DragGesture(minimumDistance: 0)
+                                    .onChanged { value in
+                                        if let last = lastDragX {
+                                            spinPhase += Double(value.location.x - last) * 0.02
+                                        }
+                                        lastDragX = value.location.x
+                                    }
+                                    .onEnded { _ in lastDragX = nil }
+                            )
+
+                        Text("Drag the pot to spin it")
+                            .font(.clayBody(11))
+                            .foregroundColor(Studio.inkFaint)
+
+                        HStack(spacing: 10) {
+                            ClayIcon(kind: .sparkle, size: 16, color: Studio.honey)
+                            TextField("Untitled Piece", text: $editingName, onCommit: {
+                                store.renamePot(pot.id, to: editingName)
+                            })
+                            .font(.clayBody(16, .bold))
+                            .foregroundColor(Studio.ink)
+                            .disableAutocorrection(true)
+                            Button(action: {
+                                store.toggleFavorite(pot.id)
+                            }) {
+                                ClayIcon(kind: pot.favorite ? .starFill : .star, size: 20,
+                                         color: pot.favorite ? Studio.honey : Studio.inkFaint)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Studio.card))
+
+                        ClayCard(padding: 14) {
+                            VStack(spacing: 9) {
+                                infoRow(label: "Clay body", value: pot.clay.displayName)
+                                infoRow(label: "Base glaze",
+                                        value: GlazeCatalog.recipe(pot.coat.baseGlazeID)?.name ?? "Bare clay")
+                                if !pot.coat.bands.isEmpty {
+                                    infoRow(label: "Bands", value: bandList(pot))
+                                }
+                                if let rim = GlazeCatalog.recipe(pot.coat.rimDipGlazeID) {
+                                    infoRow(label: "Rim dip", value: rim.name)
+                                }
+                                infoRow(label: "Finish", value: pot.crackle ? "Crackle surprise" : "Clean")
+                                if let fired = pot.firedAt {
+                                    infoRow(label: "Fired", value: dateText(fired))
+                                }
+                            }
+                        }
+
+                        Button(action: { confirmDelete = true }) {
+                            HStack(spacing: 8) {
+                                ClayIcon(kind: .trash, size: 16, color: Studio.ember)
+                                Text("Shatter this piece")
+                                    .font(.clayBody(14, .bold))
+                                    .foregroundColor(Studio.ember)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Studio.card))
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.bottom, 24)
+                    }
+                    .padding(.horizontal, 20)
+                    .clayReadable()
+                }
+                .onAppear {
+                    if !nameLoaded {
+                        nameLoaded = true
+                        editingName = pot.name
+                        spinPhase = Double(pot.artSeed % 7)
+                    }
+                }
+                .alert(isPresented: $confirmDelete) {
+                    Alert(title: Text("Shatter \(pot.displayName)?"),
+                          message: Text("Broken pottery cannot be mended. The piece will be gone for good."),
+                          primaryButton: .destructive(Text("Shatter")) {
+                              store.deletePot(pot.id)
+                              onClose()
+                          },
+                          secondaryButton: .cancel(Text("Keep it")))
+                }
+            }
+        }
+        .onDisappear {
+            if let pot = store.pot(potID), nameLoaded, editingName != pot.name {
+                store.renamePot(pot.id, to: editingName)
+            }
+        }
+    }
+
+    private func infoRow(label: String, value: String) -> some View {
+        HStack(alignment: .top) {
+            Text(label)
+                .font(.clayBody(13))
+                .foregroundColor(Studio.inkSoft)
+            Spacer()
+            Text(value)
+                .font(.clayBody(13, .bold))
+                .foregroundColor(Studio.ink)
+                .multilineTextAlignment(.trailing)
+        }
+    }
+
+    private func bandList(_ pot: PotDesign) -> String {
+        pot.coat.bands
+            .compactMap { GlazeCatalog.recipe($0.glazeID)?.name }
+            .joined(separator: ", ")
+    }
+
+    private func dateText(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .none
+        return f.string(from: date)
+    }
+}
