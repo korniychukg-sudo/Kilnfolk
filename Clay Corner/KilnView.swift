@@ -1,8 +1,15 @@
 import SwiftUI
 
+struct KilnRevealData: Identifiable {
+    let pot: PotDesign
+    let summary: RevealSummary
+    var id: UUID { pot.id }
+}
+
 struct KilnView: View {
     @EnvironmentObject var store: ClayStore
-    @State private var revealPot: PotDesign? = nil
+    @EnvironmentObject var journey: JourneyStore
+    @State private var reveal: KilnRevealData? = nil
 
     var body: some View {
         ZStack {
@@ -51,8 +58,8 @@ struct KilnView: View {
                 .clayReadable()
             }
         }
-        .sheet(item: $revealPot) { pot in
-            KilnRevealSheet(pot: pot) { revealPot = nil }
+        .sheet(item: $reveal) { data in
+            KilnRevealSheet(pot: data.pot, summary: data.summary) { reveal = nil }
         }
     }
 
@@ -90,7 +97,12 @@ struct KilnView: View {
                         if done {
                             ClayPrimaryButton(title: "Open the kiln", tint: Studio.ember) {
                                 if let fresh = store.collectFiredPot() {
-                                    revealPot = fresh
+                                    let summary = journey.registerFiredPot(
+                                        fresh,
+                                        firedTotal: store.stats.fired,
+                                        crackleTotal: store.galleryPots.filter { $0.crackle }.count)
+                                    reveal = KilnRevealData(pot: fresh, summary: summary)
+                                    UINotificationFeedbackGenerator().notificationOccurred(.success)
                                 }
                             }
                         }
@@ -213,36 +225,56 @@ struct KilnView: View {
 
 struct KilnRevealSheet: View {
     let pot: PotDesign
+    let summary: RevealSummary
     let onDone: () -> Void
     @State private var appeared = false
+    @State private var linesShown = 0
 
     var body: some View {
         ZStack {
             Studio.cream.ignoresSafeArea()
-            VStack(spacing: 18) {
-                Text("Fresh from the kiln")
-                    .font(.clayTitle(24))
-                    .foregroundColor(Studio.ink)
-                    .padding(.top, 26)
-
-                SpinningPotFigure(pot: pot, speed: 0.7)
-                    .frame(maxWidth: 260, maxHeight: 300)
-                    .scaleEffect(appeared ? 1 : 0.7)
-                    .opacity(appeared ? 1 : 0)
-
-                VStack(spacing: 8) {
-                    Text(pot.displayName)
-                        .font(.clayBody(18, .bold))
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 16) {
+                    Text("Fresh from the kiln")
+                        .font(.clayTitle(24))
                         .foregroundColor(Studio.ink)
-                    HStack(spacing: 8) {
-                        ClayChip(text: pot.clay.displayName, tint: Studio.terracotta)
-                        if let base = GlazeCatalog.recipe(pot.coat.baseGlazeID) {
-                            ClayChip(text: base.name, tint: Studio.denim)
-                        }
-                        if pot.crackle {
-                            ClayChip(text: "Crackle surprise!", tint: Studio.honey)
+                        .padding(.top, 24)
+
+                    SpinningPotFigure(pot: pot, speed: 0.7)
+                        .frame(height: 230)
+                        .frame(maxWidth: 240)
+                        .scaleEffect(appeared ? 1 : 0.7)
+                        .opacity(appeared ? 1 : 0)
+
+                    VStack(spacing: 8) {
+                        Text(pot.displayName)
+                            .font(.clayBody(18, .bold))
+                            .foregroundColor(Studio.ink)
+                        HStack(spacing: 8) {
+                            ClayChip(text: pot.clay.displayName, tint: Studio.terracotta)
+                            if let base = GlazeCatalog.recipe(pot.coat.baseGlazeID) {
+                                ClayChip(text: base.name, tint: Studio.denim)
+                            }
+                            if pot.crackle {
+                                ClayChip(text: "Crackle surprise!", tint: Studio.honey)
+                            }
                         }
                     }
+
+                    if let formName = summary.formName {
+                        formResultCard(formName)
+                    }
+
+                    xpCard
+
+                    if summary.newLevel > summary.oldLevel {
+                        rankUpCard
+                    }
+
+                    ForEach(summary.newBadges) { badge in
+                        badgeCard(badge)
+                    }
+
                     if pot.crackle {
                         Text("The glaze shivered as it cooled and left a fine web of lines. Potters chase this on purpose.")
                             .font(.clayBody(13))
@@ -250,21 +282,158 @@ struct KilnRevealSheet: View {
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 30)
                     }
-                }
 
-                Spacer()
-
-                ClayPrimaryButton(title: "Place in the gallery", tint: Studio.sage) {
-                    onDone()
+                    ClayPrimaryButton(title: "Place in the gallery", tint: Studio.sage) {
+                        onDone()
+                    }
+                    .padding(.top, 4)
+                    .padding(.bottom, 24)
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+                .padding(.horizontal, 22)
+                .clayReadable()
             }
-            .clayReadable()
+
+            ConfettiBurst(seed: pot.artSeed)
+                .ignoresSafeArea()
         }
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.65).delay(0.15)) {
                 appeared = true
+            }
+            for i in 0...summary.xpLines.count {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5 + Double(i) * 0.28) {
+                    withAnimation(.easeOut(duration: 0.3)) { linesShown = i }
+                }
+            }
+        }
+    }
+
+    private func formResultCard(_ formName: String) -> some View {
+        ClayCard(padding: 14) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(formName)
+                        .font(.clayBody(15, .bold))
+                        .foregroundColor(Studio.ink)
+                    Text(summary.stars > 0
+                         ? "Fit \(Int((summary.fit * 100).rounded()))% — the form holds!"
+                         : "Fit \(Int((summary.fit * 100).rounded()))% — not quite this time. Throw it again!")
+                        .font(.clayBody(12))
+                        .foregroundColor(Studio.inkSoft)
+                    if summary.dailyDone {
+                        HStack(spacing: 4) {
+                            ClayIcon(kind: .flame, size: 12, color: Studio.ember)
+                            Text("Form of the day · \(summary.dailyStreak)-day streak")
+                                .font(.clayBody(12, .bold))
+                                .foregroundColor(Studio.ember)
+                        }
+                    }
+                }
+                Spacer()
+                HStack(spacing: 3) {
+                    ForEach(0..<3, id: \.self) { i in
+                        ClayIcon(kind: i < summary.stars ? .starFill : .star, size: 22,
+                                 color: i < summary.stars ? Studio.honey : Studio.inkFaint)
+                    }
+                }
+            }
+        }
+    }
+
+    private var xpCard: some View {
+        ClayCard(padding: 14) {
+            VStack(spacing: 8) {
+                ForEach(Array(summary.xpLines.enumerated()), id: \.offset) { i, line in
+                    HStack {
+                        Text(line.label)
+                            .font(.clayBody(13))
+                            .foregroundColor(Studio.inkSoft)
+                        Spacer()
+                        Text("+\(line.xp) XP")
+                            .font(.clayBody(13, .bold))
+                            .foregroundColor(Studio.sage)
+                    }
+                    .opacity(i < linesShown ? 1 : 0)
+                }
+                Rectangle().fill(Studio.linen).frame(height: 1)
+                HStack {
+                    Text("Journey")
+                        .font(.clayBody(14, .bold))
+                        .foregroundColor(Studio.ink)
+                    Spacer()
+                    Text("+\(summary.totalXP) XP")
+                        .font(.clayTitle(17))
+                        .foregroundColor(Studio.terracotta)
+                }
+            }
+        }
+    }
+
+    private var rankUpCard: some View {
+        let rankName = JourneyStore.ranks.first(where: { $0.level == summary.newLevel })?.name ?? ""
+        return VStack(spacing: 10) {
+            HStack(spacing: 8) {
+                ClayIcon(kind: .sparkle, size: 18, color: .white)
+                Text("Rank up! \(rankName)")
+                    .font(.clayBody(16, .bold))
+                    .foregroundColor(.white)
+                ClayIcon(kind: .sparkle, size: 18, color: .white)
+            }
+            if !summary.unlockedGlazes.isEmpty || !summary.unlockedClays.isEmpty {
+                VStack(spacing: 6) {
+                    ForEach(summary.unlockedGlazes) { glaze in
+                        HStack(spacing: 8) {
+                            Circle().fill(glaze.fired.color).frame(width: 18, height: 18)
+                                .overlay(Circle().stroke(Color.white.opacity(0.7), lineWidth: 1))
+                            Text("New glaze unlocked: \(glaze.name)")
+                                .font(.clayBody(13, .bold))
+                                .foregroundColor(.white)
+                            Spacer()
+                        }
+                    }
+                    ForEach(summary.unlockedClays) { kind in
+                        HStack(spacing: 8) {
+                            Circle().fill(kind.wetTone.color).frame(width: 18, height: 18)
+                                .overlay(Circle().stroke(Color.white.opacity(0.7), lineWidth: 1))
+                            Text("New clay unlocked: \(kind.displayName)")
+                                .font(.clayBody(13, .bold))
+                                .foregroundColor(.white)
+                            Spacer()
+                        }
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(LinearGradient(colors: [Studio.terracotta, Studio.ember],
+                                     startPoint: .topLeading, endPoint: .bottomTrailing))
+                .shadow(color: Studio.shadow, radius: 10, x: 0, y: 5)
+        )
+    }
+
+    private func badgeCard(_ badge: JourneyBadge) -> some View {
+        ClayCard(padding: 12) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(Studio.honey.opacity(0.2)).frame(width: 44, height: 44)
+                    Circle().stroke(Studio.honey, lineWidth: 2).frame(width: 44, height: 44)
+                    ClayIcon(kind: .starFill, size: 20, color: Studio.honey)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Award earned")
+                        .font(.clayBody(11, .bold))
+                        .foregroundColor(Studio.honey)
+                    Text(badge.title)
+                        .font(.clayBody(15, .bold))
+                        .foregroundColor(Studio.ink)
+                    Text(badge.hint)
+                        .font(.clayBody(12))
+                        .foregroundColor(Studio.inkSoft)
+                }
+                Spacer()
             }
         }
     }

@@ -176,6 +176,9 @@ struct PotDesign: Codable, Equatable, Identifiable {
     var firedAt: Date? = nil
     var crackle: Bool = false
     var favorite: Bool = false
+    // v2 (optionals — v1 saves decode unchanged)
+    var formID: String? = nil
+    var formStars: Int? = nil
 
     var displayName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Untitled Piece" : name

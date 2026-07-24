@@ -4,6 +4,7 @@ import SwiftUI
 
 struct GlazeStudioView: View {
     @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var journey: JourneyStore
 
     let basePot: PotDesign
     let onReturn: () -> Void
@@ -15,6 +16,7 @@ struct GlazeStudioView: View {
     @State private var selectedGlazeID: String = GlazeCatalog.all[0].id
     @State private var bandWidth: BandWidth = .medium
     @State private var previewBandCenter: Double? = nil
+    @State private var lockHint: String? = nil
 
     enum GlazeMode: String, CaseIterable, Identifiable {
         case base, bands, rim, extras
@@ -225,21 +227,41 @@ struct GlazeStudioView: View {
     @ViewBuilder
     private var paletteRow: some View {
         if showsPalette {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(GlazeCatalog.all) { glaze in
-                        glazeSwatch(glaze)
+            VStack(spacing: 4) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(GlazeCatalog.all) { glaze in
+                            glazeSwatch(glaze)
+                        }
                     }
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 6)
                 }
-                .padding(.horizontal, 4)
-                .padding(.vertical, 6)
+                if let hint = lockHint {
+                    Text(hint)
+                        .font(.clayBody(11, .bold))
+                        .foregroundColor(Studio.denim)
+                        .transition(.opacity)
+                }
             }
         }
     }
 
     private func glazeSwatch(_ glaze: GlazeRecipe) -> some View {
         let selected = selectedGlazeID == glaze.id
+        let unlocked = journey.isGlazeUnlocked(glaze.id)
         return Button(action: {
+            guard unlocked else {
+                let lvl = journey.glazeUnlockLevel(glaze.id)
+                let rank = JourneyStore.ranks.first(where: { $0.level == lvl })?.name ?? ""
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    lockHint = "\(glaze.name) unlocks at rank \(lvl) · \(rank)"
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.6) {
+                    withAnimation(.easeInOut(duration: 0.4)) { lockHint = nil }
+                }
+                return
+            }
             selectedGlazeID = glaze.id
             switch mode {
             case .base: coat.baseGlazeID = glaze.id
@@ -268,14 +290,30 @@ struct GlazeStudioView: View {
                     }
                 }
                 .overlay(
-                    Circle().stroke(selected ? Studio.ink : Studio.ink.opacity(0.15),
-                                    lineWidth: selected ? 2.5 : 1)
+                    Circle().stroke(selected && unlocked ? Studio.ink : Studio.ink.opacity(0.15),
+                                    lineWidth: selected && unlocked ? 2.5 : 1)
+                )
+                .opacity(unlocked ? 1 : 0.32)
+                .overlay(
+                    Group {
+                        if !unlocked {
+                            VStack(spacing: 0) {
+                                ClayIcon(kind: .shield, size: 13, color: Studio.denim)
+                                Text("\(journey.glazeUnlockLevel(glaze.id))")
+                                    .font(.clayBody(9, .bold))
+                                    .foregroundColor(Studio.denim)
+                            }
+                            .padding(5)
+                            .background(Circle().fill(Studio.card.opacity(0.92)))
+                        }
+                    }
                 )
                 Text(glaze.name)
                     .font(.clayBody(10, .bold))
-                    .foregroundColor(selected ? Studio.ink : Studio.inkSoft)
+                    .foregroundColor(unlocked ? (selected ? Studio.ink : Studio.inkSoft) : Studio.inkFaint)
                     .lineLimit(1)
-                    .frame(width: 66)
+                    .minimumScaleFactor(0.8)
+                    .frame(width: 70)
             }
         }
         .buttonStyle(PlainButtonStyle())

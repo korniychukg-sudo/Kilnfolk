@@ -7,6 +7,7 @@ struct ClayCornerApp: App {
     private let cornerCheckDomain = "example"
 
     @StateObject private var store = ClayStore()
+    @StateObject private var journey = JourneyStore()
 
     var body: some Scene {
         WindowGroup {
@@ -26,6 +27,7 @@ struct ClayCornerApp: App {
                     } else {
                         RootView()
                             .environmentObject(store)
+                            .environmentObject(journey)
                             .preferredColorScheme(.light)
                     }
                 } else {

@@ -6,7 +6,7 @@ enum ClayIconKind {
     case wheel, kiln, shelf, book, dots
     case hand, sponge, rib, pull
     case undo, reset, star, starFill, trash, close, check, plus, chevronRight, chevronLeft
-    case drop, flame, clock, sparkle, info, shield
+    case drop, flame, clock, sparkle, info, shield, flag
 }
 
 /// All in-app iconography is drawn by hand — no system symbols anywhere.
@@ -323,6 +323,23 @@ struct ClayIcon: View {
             stroke(&ctx, mark, lw)
             var dot = Path()
             dot.addEllipse(in: CGRect(x: cx - lw * 0.55, y: cy - h * 0.20, width: lw * 1.1, height: lw * 1.1))
+            fill(&ctx, dot)
+
+        case .flag:
+            var pole = Path()
+            pole.move(to: CGPoint(x: rect.minX + w * 0.22, y: rect.maxY))
+            pole.addLine(to: CGPoint(x: rect.minX + w * 0.22, y: rect.minY + h * 0.04))
+            stroke(&ctx, pole, lw)
+            var pennant = Path()
+            pennant.move(to: CGPoint(x: rect.minX + w * 0.22, y: rect.minY + h * 0.08))
+            pennant.addQuadCurve(to: CGPoint(x: rect.maxX - w * 0.08, y: rect.minY + h * 0.24),
+                                 control: CGPoint(x: cx, y: rect.minY + h * 0.02))
+            pennant.addQuadCurve(to: CGPoint(x: rect.minX + w * 0.22, y: rect.minY + h * 0.46),
+                                 control: CGPoint(x: cx, y: rect.minY + h * 0.40))
+            pennant.closeSubpath()
+            stroke(&ctx, pennant, lw * 0.9)
+            var dot = Path()
+            dot.addEllipse(in: CGRect(x: cx - w * 0.06, y: rect.minY + h * 0.16, width: w * 0.12, height: w * 0.12))
             fill(&ctx, dot)
 
         case .shield:

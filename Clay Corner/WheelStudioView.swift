@@ -71,8 +71,19 @@ private struct SceneLayout {
 
 // MARK: - The Wheel
 
+struct SlipParticle: Identifiable {
+    let id = UUID()
+    var x: CGFloat
+    var y: CGFloat
+    var vx: CGFloat
+    var vy: CGFloat
+    var born: TimeInterval
+    var tint: Double
+}
+
 struct WheelStudioView: View {
     @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var journey: JourneyStore
     @Binding var selectedTab: Int
 
     @State private var profile: [Double] = PotShapes.freshLump()
@@ -89,13 +100,29 @@ struct WheelStudioView: View {
     @State private var didLoadDraft = false
     @State private var phaseAnchor: Double = 0
     @State private var anchorTime = Date()
+    @State private var ghostOn = true
+    @State private var particles: [SlipParticle] = []
 
     private var shapedEnough: Bool {
         PotShapes.shapingAmount(profile) > 0.035
     }
 
+    private var activeForm: PotForm? {
+        FormLibrary.form(journey.activeFormID)
+    }
+
+    private var liveFit: Double {
+        guard let form = activeForm else { return 0 }
+        return FormScoring.fit(profile: profile, heightScale: heightScale, form: form)
+    }
+
     private var wipPot: PotDesign {
-        PotDesign(clay: clay, profile: profile, heightScale: heightScale)
+        var p = PotDesign(clay: clay, profile: profile, heightScale: heightScale)
+        if let form = activeForm {
+            p.formID = form.id
+            p.formStars = FormScoring.stars(fit: liveFit)
+        }
+        return p
     }
 
     var body: some View {
@@ -138,12 +165,14 @@ struct WheelStudioView: View {
                 onReturn: { showGlazeStudio = false },
                 onSent: {
                     showGlazeStudio = false
+                    journey.activeFormID = nil
                     freshLump()
                     store.clearDraft()
                     selectedTab = 1
                 }
             )
             .environmentObject(store)
+            .environmentObject(journey)
         }
         .alert(isPresented: $showResetConfirm) {
             Alert(title: Text("Fresh clay?"),
@@ -200,9 +229,34 @@ struct WheelStudioView: View {
                         drawWheel(&ctx, layout: layout, phase: phase)
                         PotPainter.drawInRect(&ctx, rect: layout.potRect, pot: wipPot,
                                               phase: phase, wet: true, showShadow: false)
+                        if let form = activeForm, ghostOn {
+                            drawGhost(&ctx, form: form, layout: layout)
+                        }
+                        drawParticles(&ctx, now: timeline.date.timeIntervalSinceReferenceDate)
                     }
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
+
+                VStack {
+                    if let form = activeForm {
+                        challengeBanner(form)
+                    } else {
+                        dailyChip
+                    }
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Text("H \(PotMeasure.heightCM(heightScale)) cm · W \(PotMeasure.widthCM(profile)) cm")
+                            .font(.clayBody(11, .bold))
+                            .foregroundColor(Studio.inkSoft)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Capsule().fill(Studio.card.opacity(0.88)))
+                            .padding(.trailing, 10)
+                            .padding(.bottom, 6)
+                    }
+                }
+                .padding(.top, 8)
 
                 if stoppedHint {
                     Text("Press a pedal below to spin the wheel")
@@ -232,6 +286,120 @@ struct WheelStudioView: View {
         return SceneLayout(potRect: potRect, wheelCenter: center, wheelRX: wheelRX, wheelRY: wheelRY)
     }
 
+    private func drawGhost(_ ctx: inout GraphicsContext, form: PotForm, layout: SceneLayout) {
+        let geo = PotGeometry(rect: layout.potRect, profile: form.targetProfile,
+                              heightScale: form.targetHeight)
+        let path = geo.slicePath(0, 1)
+        ctx.stroke(path, with: .color(Studio.denim.opacity(0.75)),
+                   style: StrokeStyle(lineWidth: 2.4, lineCap: .round, dash: [7, 6]))
+    }
+
+    private func drawParticles(_ ctx: inout GraphicsContext, now: TimeInterval) {
+        for p in particles {
+            let age = now - p.born
+            guard age >= 0 && age < 0.7 else { continue }
+            let t = age / 0.7
+            let x = p.x + p.vx * CGFloat(age)
+            let y = p.y + p.vy * CGFloat(age) + CGFloat(age * age) * 220
+            let size = 4.5 * (1 - t) + 1.5
+            let tone = clay.wetTone
+            let color = Color(red: tone.r + p.tint, green: tone.g + p.tint, blue: tone.b + p.tint)
+            ctx.fill(Path(ellipseIn: CGRect(x: x, y: y, width: size, height: size)),
+                     with: .color(color.opacity(0.75 * (1 - t))))
+        }
+    }
+
+    private func spawnParticles(at point: CGPoint, intensity: Double) {
+        let now = Date().timeIntervalSinceReferenceDate
+        let count = intensity > 0.5 ? 3 : 2
+        for _ in 0..<count {
+            particles.append(SlipParticle(
+                x: point.x, y: point.y,
+                vx: CGFloat.random(in: -70...70),
+                vy: CGFloat.random(in: -120 ... -30),
+                born: now,
+                tint: Double.random(in: -0.06...0.10)))
+        }
+        if particles.count > 60 {
+            particles.removeFirst(particles.count - 60)
+        }
+    }
+
+    private func challengeBanner(_ form: PotForm) -> some View {
+        let fit = liveFit
+        let stars = FormScoring.stars(fit: fit)
+        return HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(form.name)
+                    .font(.clayBody(13, .bold))
+                    .foregroundColor(Studio.ink)
+                HStack(spacing: 3) {
+                    ForEach(0..<3, id: \.self) { i in
+                        ClayIcon(kind: i < stars ? .starFill : .star, size: 11,
+                                 color: i < stars ? Studio.honey : Studio.inkFaint)
+                    }
+                }
+            }
+            Text("\(Int((fit * 100).rounded()))%")
+                .font(.clayTitle(19))
+                .foregroundColor(fit >= 0.78 ? Studio.sage : Studio.terracotta)
+                .frame(minWidth: 46)
+            Button(action: { ghostOn.toggle() }) {
+                Text(ghostOn ? "Hide guide" : "Show guide")
+                    .font(.clayBody(11, .bold))
+                    .foregroundColor(Studio.denim)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+                    .background(Capsule().fill(Studio.denim.opacity(0.12)))
+            }
+            .buttonStyle(PlainButtonStyle())
+            Button(action: {
+                journey.activeFormID = nil
+            }) {
+                ClayIcon(kind: .close, size: 13, color: Studio.inkSoft)
+                    .padding(7)
+                    .background(Circle().fill(Studio.linen))
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(Capsule().fill(Studio.card.opacity(0.95)))
+        .shadow(color: Studio.shadow, radius: 6, x: 0, y: 3)
+    }
+
+    private var dailyChip: some View {
+        let form = journey.formOfTheDay()
+        let done = journey.dailyDone()
+        return Button(action: {
+            if !done { journey.activeFormID = form.id }
+        }) {
+            HStack(spacing: 7) {
+                ClayIcon(kind: done ? .check : .sparkle, size: 14,
+                         color: done ? Studio.sage : Studio.honey)
+                Text(done ? "Form of the day done!" : "Form of the day: \(form.name)")
+                    .font(.clayBody(12, .bold))
+                    .foregroundColor(Studio.ink)
+                if journey.state.dailyStreak > 0 {
+                    HStack(spacing: 3) {
+                        ClayIcon(kind: .flame, size: 12, color: Studio.ember)
+                        Text("\(journey.state.dailyStreak)")
+                            .font(.clayBody(12, .bold))
+                            .foregroundColor(Studio.ember)
+                    }
+                }
+                if !done {
+                    ClayIcon(kind: .chevronRight, size: 11, color: Studio.inkFaint)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Capsule().fill(Studio.card.opacity(0.95)))
+            .shadow(color: Studio.shadow, radius: 6, x: 0, y: 3)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
     private func drawWheel(_ ctx: inout GraphicsContext, layout: SceneLayout, phase: Double) {
         let c = layout.wheelCenter
         let rx = layout.wheelRX, ry = layout.wheelRY
@@ -239,6 +407,11 @@ struct WheelStudioView: View {
         // shadow
         let shadowRect = CGRect(x: c.x - rx * 1.12, y: c.y + ry * 0.35, width: rx * 2.24, height: ry * 1.1)
         ctx.fill(Path(ellipseIn: shadowRect), with: .color(Color.black.opacity(0.14)))
+
+        // splash pan behind the wheel head
+        let panRect = CGRect(x: c.x - rx * 1.22, y: c.y - ry * 0.55, width: rx * 2.44, height: ry * 2.3)
+        ctx.fill(Path(ellipseIn: panRect), with: .color(Color(red: 0.47, green: 0.36, blue: 0.28)))
+        ctx.stroke(Path(ellipseIn: panRect), with: .color(Color.white.opacity(0.10)), lineWidth: 2)
 
         // wheel side (thickness)
         let sideRect = CGRect(x: c.x - rx, y: c.y - ry + ry * 0.55, width: rx * 2, height: ry * 2)
@@ -294,6 +467,10 @@ struct WheelStudioView: View {
                     return
                 }
                 applyShaping(current: value.location, last: last, layout: layout)
+                let speed = abs(value.location.x - last.x) + abs(value.location.y - last.y)
+                if speed > 1.2 {
+                    spawnParticles(at: value.location, intensity: Double(min(1, speed / 14)))
+                }
                 lastTouch = value.location
             }
             .onEnded { _ in
@@ -527,7 +704,11 @@ struct WheelStudioView: View {
 
     private func clayCard(_ kind: ClayBodyKind) -> some View {
         let selected = clay == kind
+        let unlocked = journey.isClayUnlocked(kind)
+        let unlockLevel = journey.clayUnlockLevel(kind)
+        let rankName = JourneyStore.ranks.first(where: { $0.level == unlockLevel })?.name ?? ""
         return Button(action: {
+            guard unlocked else { return }
             clay = kind
             store.saveDraft(profile: profile, heightScale: heightScale, clay: clay)
             showClayPicker = false
@@ -540,11 +721,12 @@ struct WheelStudioView: View {
                         .overlay(Circle().stroke(Color.white, lineWidth: 1.5).frame(width: 22, height: 22).offset(x: 12, y: 12))
                 }
                 .frame(width: 52, height: 52)
+                .opacity(unlocked ? 1 : 0.35)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(kind.displayName)
                         .font(.clayBody(16, .bold))
-                        .foregroundColor(Studio.ink)
-                    Text(kind.blurb)
+                        .foregroundColor(unlocked ? Studio.ink : Studio.inkSoft)
+                    Text(unlocked ? kind.blurb : "Unlocks at rank \(unlockLevel) · \(rankName). Keep firing pieces to get there.")
                         .font(.clayBody(12))
                         .foregroundColor(Studio.inkSoft)
                         .multilineTextAlignment(.leading)
@@ -553,6 +735,8 @@ struct WheelStudioView: View {
                 Spacer()
                 if selected {
                     ClayIcon(kind: .check, size: 18, color: Studio.sage)
+                } else if !unlocked {
+                    ClayChip(text: "Rank \(unlockLevel)", tint: Studio.denim)
                 }
             }
             .padding(14)

@@ -143,6 +143,18 @@ struct GalleryView: View {
                 shelfRow(row, columns: columns)
             }
         }
+        .padding(.vertical, 16)
+        .padding(.horizontal, 10)
+        .background(
+            CornerArt(name: "cabinet_back", fallback: Studio.linen)
+                .scaledToFill()
+                .clipped()
+                .cornerRadius(20)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .stroke(Studio.woodDark.opacity(0.6), lineWidth: 3)
+                )
+        )
     }
 
     private func shelfRow(_ row: [PotDesign], columns: Int) -> some View {
@@ -169,6 +181,11 @@ struct GalleryView: View {
         Button(action: { selectedPotID = pot.id }) {
             VStack(spacing: 4) {
                 ZStack(alignment: .topTrailing) {
+                    if pot.favorite {
+                        RadialGradient(colors: [Studio.honey.opacity(0.30), .clear],
+                                       center: .center, startRadius: 4, endRadius: 58)
+                            .frame(height: 106)
+                    }
                     PotFigure(pot: pot, phase: Double(pot.artSeed % 7), wet: false, showShadow: true)
                         .frame(height: 106)
                         .frame(maxWidth: .infinity)
@@ -177,14 +194,28 @@ struct GalleryView: View {
                             .padding(3)
                     }
                 }
-                Text(pot.displayName)
-                    .font(.clayBody(11, .bold))
-                    .foregroundColor(Studio.inkSoft)
-                    .lineLimit(1)
+                HStack(spacing: 3) {
+                    if let stars = pot.formStars, stars > 0, pot.formID != nil {
+                        ClayIcon(kind: .starFill, size: 9, color: Studio.honey)
+                    }
+                    Text(shelfLabel(pot))
+                        .font(.clayBody(11, .bold))
+                        .foregroundColor(.white.opacity(0.85))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
             }
         }
         .buttonStyle(PlainButtonStyle())
         .frame(maxWidth: .infinity)
+    }
+
+    private func shelfLabel(_ pot: PotDesign) -> String {
+        if pot.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+           let form = FormLibrary.form(pot.formID) {
+            return form.name
+        }
+        return pot.displayName
     }
 }
 
@@ -259,6 +290,24 @@ struct PotDetailSheet: View {
 
                         ClayCard(padding: 14) {
                             VStack(spacing: 9) {
+                                if let form = FormLibrary.form(pot.formID) {
+                                    HStack {
+                                        Text("Classic form")
+                                            .font(.clayBody(13))
+                                            .foregroundColor(Studio.inkSoft)
+                                        Spacer()
+                                        HStack(spacing: 4) {
+                                            Text(form.name)
+                                                .font(.clayBody(13, .bold))
+                                                .foregroundColor(Studio.ink)
+                                            ForEach(0..<max(0, min(3, pot.formStars ?? 0)), id: \.self) { _ in
+                                                ClayIcon(kind: .starFill, size: 11, color: Studio.honey)
+                                            }
+                                        }
+                                    }
+                                }
+                                infoRow(label: "Size",
+                                        value: "\(PotMeasure.heightCM(pot.heightScale)) cm tall · \(PotMeasure.widthCM(pot.profile)) cm wide")
                                 infoRow(label: "Clay body", value: pot.clay.displayName)
                                 infoRow(label: "Base glaze",
                                         value: GlazeCatalog.recipe(pot.coat.baseGlazeID)?.name ?? "Bare clay")

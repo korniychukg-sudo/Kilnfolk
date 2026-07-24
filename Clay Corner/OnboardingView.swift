@@ -18,8 +18,8 @@ struct OnboardingView: View {
               title: "Glaze and fire",
               text: "Dip your pot in one of twelve glazes, paint bands, dust on speckles. Then load the kiln and wait for the reveal — the fire always changes the colors."),
         Slide(art: "onboarding_shelf",
-              title: "Fill your gallery",
-              text: "Every fired piece takes its place on your shelf. Spin it, name it, love it. Some come out with a crackle surprise."),
+              title: "Grow as a potter",
+              text: "Throw the 12 classic forms — from Tea Bowl to Meiping — and earn stars for accuracy. Rank up to unlock glazes and clays, collect awards, and fill your gallery shelf."),
     ]
 
     var body: some View {

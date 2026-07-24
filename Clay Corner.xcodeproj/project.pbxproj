@@ -24,6 +24,10 @@
 		CC0000000000000000000115 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000015 /* MoreView.swift */; };
 		CC0000000000000000000116 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000016 /* OnboardingView.swift */; };
 		CC0000000000000000000117 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000017 /* RootView.swift */; };
+		CC0000000000000000000131 /* FormLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000031 /* FormLibrary.swift */; };
+		CC0000000000000000000132 /* JourneyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000032 /* JourneyStore.swift */; };
+		CC0000000000000000000133 /* JourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000033 /* JourneyView.swift */; };
+		CC0000000000000000000134 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000034 /* ConfettiView.swift */; };
 		CC0000000000000000000120 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000020 /* Assets.xcassets */; };
 		CC0000000000000000000121 /* Art in Resources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000021 /* Art */; };
 		CC0000000000000000000122 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000024 /* PrivacyInfo.xcprivacy */; };
@@ -47,6 +51,10 @@
 		CC0000000000000000000015 /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 		CC0000000000000000000016 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		CC0000000000000000000017 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		CC0000000000000000000031 /* FormLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormLibrary.swift; sourceTree = "<group>"; };
+		CC0000000000000000000032 /* JourneyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JourneyStore.swift; sourceTree = "<group>"; };
+		CC0000000000000000000033 /* JourneyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JourneyView.swift; sourceTree = "<group>"; };
+		CC0000000000000000000034 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		CC0000000000000000000020 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CC0000000000000000000021 /* Art */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Art; sourceTree = "<group>"; };
 		CC0000000000000000000022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -93,6 +101,10 @@
 				CC0000000000000000000015 /* MoreView.swift */,
 				CC0000000000000000000016 /* OnboardingView.swift */,
 				CC0000000000000000000017 /* RootView.swift */,
+				CC0000000000000000000031 /* FormLibrary.swift */,
+				CC0000000000000000000032 /* JourneyStore.swift */,
+				CC0000000000000000000033 /* JourneyView.swift */,
+				CC0000000000000000000034 /* ConfettiView.swift */,
 				CC0000000000000000000020 /* Assets.xcassets */,
 				CC0000000000000000000021 /* Art */,
 				CC0000000000000000000022 /* Info.plist */,
@@ -197,6 +209,10 @@
 				CC0000000000000000000115 /* MoreView.swift in Sources */,
 				CC0000000000000000000116 /* OnboardingView.swift in Sources */,
 				CC0000000000000000000117 /* RootView.swift in Sources */,
+				CC0000000000000000000131 /* FormLibrary.swift in Sources */,
+				CC0000000000000000000132 /* JourneyStore.swift in Sources */,
+				CC0000000000000000000133 /* JourneyView.swift in Sources */,
+				CC0000000000000000000134 /* ConfettiView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

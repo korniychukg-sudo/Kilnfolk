@@ -403,8 +403,27 @@ func sceneStudioBackdrop() {
     ctx.move(to: CGPoint(x: wx, y: wy + wh / 2))
     ctx.addLine(to: CGPoint(x: wx + ww, y: wy + wh / 2))
     ctx.strokePath()
-    // hanging shelf with pot silhouettes
+    // sun beam
+    let beam = CGMutablePath()
+    beam.move(to: CGPoint(x: wx + ww * 0.5, y: wy + wh * 0.6))
+    beam.addLine(to: CGPoint(x: wx + ww * 1.9, y: 340))
+    beam.addLine(to: CGPoint(x: wx + ww * 0.9, y: 340))
+    beam.closeSubpath()
+    ctx.addPath(beam)
+    ctx.setFillColor(rgba(0.99, 0.88, 0.55, 0.10))
+    ctx.fillPath()
+    // hanging shelf with pot silhouettes and tools
     woodPlank(ctx, x: 820, y: 1300, w: 460, h: 40)
+    // rib tool leaning on shelf
+    let ribT = CGMutablePath()
+    ribT.move(to: CGPoint(x: 1232, y: 1342))
+    ribT.addLine(to: CGPoint(x: 1250, y: 1424))
+    ribT.addLine(to: CGPoint(x: 1282, y: 1412))
+    ribT.addQuadCurve(to: CGPoint(x: 1266, y: 1342), control: CGPoint(x: 1288, y: 1370))
+    ribT.closeSubpath()
+    ctx.addPath(ribT)
+    ctx.setFillColor(rgb(0.84, 0.70, 0.50))
+    ctx.fillPath()
     drawPotShape(ctx, cx: 910, baseY: 1342, halfW: 48, height: 130, profile: vaseProfile,
                  body: rgb(0.72, 0.44, 0.30), dark: rgb(0.58, 0.32, 0.20))
     drawPotShape(ctx, cx: 1050, baseY: 1342, halfW: 56, height: 90, profile: bowlProfile,
@@ -963,6 +982,91 @@ func sceneTechAll() {
     }
 }
 
+// MARK: - v2 scenes
+
+func sceneAwardsBanner() {
+    let w = 1600, h = 800
+    let ctx = makeCtx(w, h)
+    fillVertical(ctx, w, h, top: rgb(0.93, 0.88, 0.79), bottom: rgb(0.87, 0.79, 0.67))
+    woodPlank(ctx, x: 140, y: 260, w: 1320, h: 54)
+    // medals on the shelf
+    let medalColors: [CGColor] = [rgb(0.87, 0.665, 0.30), rgb(0.77, 0.41, 0.25), rgb(0.53, 0.61, 0.48)]
+    for (i, mc) in medalColors.enumerated() {
+        let cx = 420.0 + Double(i) * 380
+        // ribbon
+        let rib = CGMutablePath()
+        rib.move(to: CGPoint(x: cx - 46, y: 314))
+        rib.addLine(to: CGPoint(x: cx - 90, y: 470))
+        rib.addLine(to: CGPoint(x: cx + 90, y: 470))
+        rib.addLine(to: CGPoint(x: cx + 46, y: 314))
+        rib.closeSubpath()
+        ctx.addPath(rib)
+        ctx.setFillColor(rgb(0.35, 0.47, 0.57))
+        ctx.fillPath()
+        // disc
+        ctx.setFillColor(mc)
+        ctx.fillEllipse(in: CGRect(x: cx - 120, y: 314, width: 240, height: 240))
+        ctx.setStrokeColor(rgba(1, 1, 1, 0.4))
+        ctx.setLineWidth(10)
+        ctx.strokeEllipse(in: CGRect(x: cx - 88, y: 346, width: 176, height: 176))
+        // star center
+        let star = CGMutablePath()
+        let scx = cx, scy = 434.0
+        for k in 0..<10 {
+            let r = k % 2 == 0 ? 62.0 : 26.0
+            let a = Double(k) * .pi / 5 - .pi / 2
+            let pt = CGPoint(x: scx + cos(a) * r, y: scy + sin(a) * r)
+            if k == 0 { star.move(to: pt) } else { star.addLine(to: pt) }
+        }
+        star.closeSubpath()
+        ctx.addPath(star)
+        ctx.setFillColor(rgba(1, 1, 1, 0.85))
+        ctx.fillPath()
+    }
+    sparkle(ctx, x: 200, y: 640, r: 30, color: rgba(0.871, 0.665, 0.298, 0.8))
+    sparkle(ctx, x: 1420, y: 600, r: 24, color: rgba(0.769, 0.412, 0.247, 0.6))
+    addNoise(ctx, amount: 7)
+    vignette(ctx, w, h, strength: 0.13)
+    savePNG(ctx, "\(artDir)/awards_banner.png")
+}
+
+func sceneCabinetBack() {
+    let w = 1200, h = 1200
+    let ctx = makeCtx(w, h)
+    fillVertical(ctx, w, h, top: rgb(0.42, 0.30, 0.20), bottom: rgb(0.34, 0.23, 0.15))
+    // vertical planks
+    ctx.setStrokeColor(rgba(0.15, 0.09, 0.05, 0.5))
+    ctx.setLineWidth(6)
+    var px = 150.0
+    while px < Double(w) {
+        ctx.move(to: CGPoint(x: px, y: 0))
+        ctx.addLine(to: CGPoint(x: px + rnd(-8, 8), y: Double(h)))
+        ctx.strokePath()
+        px += rnd(180, 260)
+    }
+    // grain
+    ctx.setStrokeColor(rgba(0.2, 0.12, 0.06, 0.35))
+    for _ in 0..<70 {
+        let gy = rnd(20, Double(h) - 20)
+        let gx = rnd(0, Double(w) - 200)
+        let len = rnd(60, 200)
+        ctx.setLineWidth(rnd(1.5, 4))
+        ctx.move(to: CGPoint(x: gx, y: gy))
+        ctx.addQuadCurve(to: CGPoint(x: gx + len, y: gy + rnd(-5, 5)),
+                         control: CGPoint(x: gx + len / 2, y: gy + rnd(-10, 10)))
+        ctx.strokePath()
+    }
+    // warm center light
+    let grad = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB)!,
+                          colors: [rgba(0.95, 0.78, 0.45, 0.16), rgba(0, 0, 0, 0)] as CFArray,
+                          locations: [0, 1])!
+    ctx.drawRadialGradient(grad, startCenter: CGPoint(x: 600, y: 700), startRadius: 30,
+                           endCenter: CGPoint(x: 600, y: 600), endRadius: 700, options: [])
+    addNoise(ctx, amount: 8)
+    vignette(ctx, w, h, strength: 0.30)
+    savePNG(ctx, "\(artDir)/cabinet_back.png")
+}
+
 // MARK: - App icon (abstract, opaque)
 
 func makeAppIcon() {
@@ -1019,5 +1123,7 @@ sceneMoreBanner()
 sceneWoodShelf()
 sceneHandbookBanners()
 sceneTechAll()
+sceneAwardsBanner()
+sceneCabinetBack()
 makeAppIcon()
 print("done")

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MoreView: View {
     @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var journey: JourneyStore
     @State private var showPrivacy = false
     @State private var confirmReset = false
 
@@ -41,14 +42,19 @@ struct MoreView: View {
                                 .font(.clayBody(15, .bold))
                                 .foregroundColor(Studio.ink)
                             flowRow(icon: .wheel, text: "Shape a pot with one finger while the wheel spins")
+                            flowRow(icon: .flag, text: "Throw the 12 classic forms and earn stars for accuracy")
                             flowRow(icon: .drop, text: "Dip it in glaze, paint bands, dust on speckles")
-                            flowRow(icon: .flame, text: "Fire it in the kiln and wait for the reveal")
+                            flowRow(icon: .flame, text: "Fire it in the kiln — XP, ranks and new glazes await")
                             flowRow(icon: .shelf, text: "Place every finished piece on your gallery shelf")
                         }
                     }
 
                     ClayCard(padding: 14) {
                         VStack(spacing: 9) {
+                            statRow(label: "Potter's rank", value: "\(journey.level) · \(journey.rankName)")
+                            statRow(label: "Journey XP", value: "\(journey.state.xp)")
+                            statRow(label: "Form stars", value: "\(journey.totalStars) of 36")
+                            statRow(label: "Daily streak", value: "\(journey.state.dailyStreak) days")
                             statRow(label: "Pieces thrown", value: "\(store.stats.thrown)")
                             statRow(label: "Pieces fired", value: "\(store.stats.fired)")
                             statRow(label: "On the shelf now", value: "\(store.galleryPots.count)")
@@ -98,8 +104,11 @@ struct MoreView: View {
         }
         .alert(isPresented: $confirmReset) {
             Alert(title: Text("Start over?"),
-                  message: Text("Every pot, the kiln queue and your stats will be cleared. This cannot be undone."),
-                  primaryButton: .destructive(Text("Clear everything")) { store.resetAll() },
+                  message: Text("Every pot, the kiln queue, your rank, stars and awards will be cleared. This cannot be undone."),
+                  primaryButton: .destructive(Text("Clear everything")) {
+                      store.resetAll()
+                      journey.resetAll()
+                  },
                   secondaryButton: .cancel(Text("Keep my pots")))
         }
     }

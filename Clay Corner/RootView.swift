@@ -18,7 +18,7 @@ struct RootView: View {
                         NavigationView { GalleryView().navigationBarHidden(true) }
                             .navigationViewStyle(StackNavigationViewStyle())
                     case 3:
-                        NavigationView { HandbookView() }
+                        NavigationView { JourneyView(selectedTab: $selectedTab) }
                             .navigationViewStyle(StackNavigationViewStyle())
                     default:
                         NavigationView { MoreView().navigationBarHidden(true) }
@@ -38,7 +38,7 @@ struct RootView: View {
             tabButton(index: 0, label: "Studio", icon: .wheel)
             tabButton(index: 1, label: "Kiln", icon: .kiln, badge: kilnBadge)
             tabButton(index: 2, label: "Gallery", icon: .shelf)
-            tabButton(index: 3, label: "Handbook", icon: .book)
+            tabButton(index: 3, label: "Journey", icon: .flag)
             tabButton(index: 4, label: "More", icon: .dots)
         }
         .padding(.top, 8)
