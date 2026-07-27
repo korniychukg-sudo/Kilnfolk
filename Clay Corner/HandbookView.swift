@@ -1,63 +1,12 @@
 import SwiftUI
 
-struct HandbookView: View {
-    var body: some View {
-        ZStack {
-            Studio.cream.ignoresSafeArea()
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 14) {
-                    ClaySectionHeader(title: "The Potter's Handbook",
-                                      caption: "Everything your studio teacher would tell you")
-                        .padding(.top, 12)
-
-                    ForEach(HandbookLibrary.sections) { section in
-                        NavigationLink(destination: HandbookSectionView(section: section)) {
-                            sectionCard(section)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                }
-                .padding(.horizontal, 18)
-                .padding(.bottom, 24)
-                .clayReadable()
-            }
-        }
-        .navigationBarHidden(true)
-    }
-
-    private func sectionCard(_ section: HandbookSection) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            CornerArt(name: section.artName)
-                .scaledToFill()
-                .frame(height: 110)
-                .frame(maxWidth: .infinity)
-                .clipped()
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(section.title)
-                        .font(.clayBody(16, .bold))
-                        .foregroundColor(Studio.ink)
-                    Text(section.caption)
-                        .font(.clayBody(12))
-                        .foregroundColor(Studio.inkSoft)
-                }
-                Spacer()
-                ClayChip(text: "\(section.items.count) notes", tint: Studio.terracotta)
-                ClayIcon(kind: .chevronRight, size: 14, color: Studio.inkFaint)
-            }
-            .padding(14)
-            .background(Studio.card)
-        }
-        .cornerRadius(20)
-        .shadow(color: Studio.shadow, radius: 8, x: 0, y: 4)
-    }
-}
-
 // MARK: - Section detail
 
 struct HandbookSectionView: View {
     let section: HandbookSection
     @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.horizontalSizeClass) private var hSize
+    @Environment(\.verticalSizeClass) private var vSize
 
     var body: some View {
         ZStack {
@@ -67,7 +16,7 @@ struct HandbookSectionView: View {
                     ZStack(alignment: .topLeading) {
                         CornerArt(name: section.artName)
                             .scaledToFill()
-                            .frame(height: 170)
+                            .frame(height: ClayLayout.isPad(hSize, vSize) ? 240 : 170)
                             .frame(maxWidth: .infinity)
                             .clipped()
                             .cornerRadius(22)
@@ -131,7 +80,7 @@ struct HandbookSectionView: View {
                 if let art = item.artName {
                     CornerArt(name: art)
                         .scaledToFill()
-                        .frame(height: 130)
+                        .frame(height: ClayLayout.isPad(hSize, vSize) ? 190 : 130)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(14)

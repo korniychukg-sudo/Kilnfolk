@@ -3,6 +3,8 @@ import SwiftUI
 struct MoreView: View {
     @EnvironmentObject var store: ClayStore
     @EnvironmentObject var journey: JourneyStore
+    @Environment(\.horizontalSizeClass) private var hSize
+    @Environment(\.verticalSizeClass) private var vSize
     @State private var showPrivacy = false
     @State private var confirmReset = false
 
@@ -13,7 +15,7 @@ struct MoreView: View {
                 VStack(spacing: 14) {
                     CornerArt(name: "more_banner")
                         .scaledToFill()
-                        .frame(height: 140)
+                        .frame(height: ClayLayout.bannerHeight(hSize, vSize) - 10)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(22)

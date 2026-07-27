@@ -84,6 +84,8 @@ struct SlipParticle: Identifiable {
 struct WheelStudioView: View {
     @EnvironmentObject var store: ClayStore
     @EnvironmentObject var journey: JourneyStore
+    @Environment(\.horizontalSizeClass) private var hSize
+    @Environment(\.verticalSizeClass) private var vSize
     @Binding var selectedTab: Int
 
     @State private var profile: [Double] = PotShapes.freshLump()
@@ -127,7 +129,7 @@ struct WheelStudioView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let isWide = geo.size.width > geo.size.height * 1.15
+            let isWide = isWideLayout(geo.size)
             ZStack {
                 Studio.cream.ignoresSafeArea()
                 if isWide {
@@ -137,10 +139,11 @@ struct WheelStudioView: View {
                         VStack(spacing: 14) {
                             header
                             Spacer(minLength: 0)
-                            controls
+                            controls(stacked: true)
                         }
                         .padding(16)
-                        .frame(width: min(330, geo.size.width * 0.42))
+                        .frame(width: min(ClayLayout.isPad(hSize, vSize) ? 400 : 330,
+                                          geo.size.width * 0.42))
                     }
                 } else {
                     VStack(spacing: 0) {
@@ -149,7 +152,7 @@ struct WheelStudioView: View {
                             .padding(.top, 8)
                         sceneArea
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        controls
+                        controls(stacked: false)
                             .padding(.horizontal, 18)
                             .padding(.bottom, 10)
                             .clayReadable()
@@ -275,14 +278,28 @@ struct WheelStudioView: View {
         .clipped()
     }
 
+    private func isWideLayout(_ size: CGSize) -> Bool {
+        size.width > size.height * 1.15
+    }
+
+    /// The wheel + pot are laid out inside a fixed-aspect box so the silhouette keeps
+    /// the same proportions on a tall iPad canvas as it does on a phone.
     private func sceneLayout(_ size: CGSize) -> SceneLayout {
-        let wheelRX = min(size.width * 0.40, 185)
+        let topPad: CGFloat = 26, bottomPad: CGFloat = 18
+        let sceneAspect: CGFloat = 0.62
+        let availH = max(180, size.height - topPad - bottomPad)
+
+        var sceneW = min(availH * sceneAspect, 640)
+        if sceneW > size.width * 0.92 { sceneW = size.width * 0.92 }
+        let sceneH = min(availH, sceneW / sceneAspect)
+        let originY = topPad + (availH - sceneH) / 2
+
+        let wheelRX = sceneW / 2
         let wheelRY = wheelRX * 0.26
-        let center = CGPoint(x: size.width / 2, y: size.height - wheelRY - 18)
+        let center = CGPoint(x: size.width / 2, y: originY + sceneH - wheelRY)
         let potW = wheelRX * 1.66
-        let topPad: CGFloat = 26
-        let potRect = CGRect(x: center.x - potW / 2, y: topPad,
-                             width: potW, height: center.y - topPad - wheelRY * 0.42)
+        let potRect = CGRect(x: center.x - potW / 2, y: originY,
+                             width: potW, height: center.y - originY - wheelRY * 0.42)
         return SceneLayout(potRect: potRect, wheelCenter: center, wheelRX: wheelRX, wheelRY: wheelRY)
     }
 
@@ -539,7 +556,9 @@ struct WheelStudioView: View {
 
     // MARK: Controls
 
-    private var controls: some View {
+    /// `stacked` splits the clay picker and the pedal onto separate rows — the side
+    /// panel in landscape is too narrow to hold both without wrapping the labels.
+    private func controls(stacked: Bool) -> some View {
         VStack(spacing: 12) {
             Text(tool.hint)
                 .font(.clayBody(12))
@@ -554,9 +573,14 @@ struct WheelStudioView: View {
                 }
             }
 
-            HStack(spacing: 10) {
+            if stacked {
                 clayButton
                 pedal
+            } else {
+                HStack(spacing: 10) {
+                    clayButton
+                    pedal
+                }
             }
 
             ClayPrimaryButton(title: shapedEnough ? "Glaze this piece" : "Shape the clay first…",

@@ -2,6 +2,8 @@ import SwiftUI
 
 struct GalleryView: View {
     @EnvironmentObject var store: ClayStore
+    @Environment(\.horizontalSizeClass) private var hSize
+    @Environment(\.verticalSizeClass) private var vSize
     @State private var filter: GalleryFilter = .all
     @State private var selectedPotID: UUID? = nil
 
@@ -18,14 +20,15 @@ struct GalleryView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let columns = geo.size.width > 700 ? 4 : 3
+            // Content is capped at the readable width, so count columns against that.
+            let columns = min(geo.size.width, 660) > 600 ? 4 : 3
             ZStack {
                 Studio.cream.ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
                         CornerArt(name: "gallery_banner")
                             .scaledToFill()
-                            .frame(height: 150)
+                            .frame(height: ClayLayout.bannerHeight(hSize, vSize))
                             .frame(maxWidth: .infinity)
                             .clipped()
                             .cornerRadius(22)
@@ -146,14 +149,19 @@ struct GalleryView: View {
         .padding(.vertical, 16)
         .padding(.horizontal, 10)
         .background(
-            CornerArt(name: "cabinet_back", fallback: Studio.linen)
-                .scaledToFill()
-                .clipped()
-                .cornerRadius(20)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(Studio.woodDark.opacity(0.6), lineWidth: 3)
-                )
+            // GeometryReader pins the panel art to the shelves' own size; a bare
+            // scaledToFill background grows to a square and covers its neighbours.
+            GeometryReader { panel in
+                CornerArt(name: "cabinet_back", fallback: Studio.linen)
+                    .scaledToFill()
+                    .frame(width: panel.size.width, height: panel.size.height)
+                    .clipped()
+                    .cornerRadius(20)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .stroke(Studio.woodDark.opacity(0.6), lineWidth: 3)
+                    )
+            }
         )
     }
 

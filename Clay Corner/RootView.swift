@@ -41,6 +41,9 @@ struct RootView: View {
             tabButton(index: 3, label: "Journey", icon: .flag)
             tabButton(index: 4, label: "More", icon: .dots)
         }
+        // Keeps the tabs together instead of stranding them across a wide iPad bar.
+        .frame(maxWidth: 620)
+        .frame(maxWidth: .infinity)
         .padding(.top, 8)
         .padding(.bottom, 4)
         .background(Studio.card.edgesIgnoringSafeArea(.bottom))

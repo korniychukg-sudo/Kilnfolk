@@ -3,6 +3,8 @@ import SwiftUI
 struct JourneyView: View {
     @EnvironmentObject var store: ClayStore
     @EnvironmentObject var journey: JourneyStore
+    @Environment(\.horizontalSizeClass) private var hSize
+    @Environment(\.verticalSizeClass) private var vSize
     @Binding var selectedTab: Int
     @State private var segment: JourneySegment = .forms
 
@@ -247,7 +249,7 @@ struct JourneyView: View {
         VStack(spacing: 12) {
             CornerArt(name: "awards_banner")
                 .scaledToFill()
-                .frame(height: 110)
+                .frame(height: ClayLayout.isPad(hSize, vSize) ? 170 : 110)
                 .frame(maxWidth: .infinity)
                 .clipped()
                 .cornerRadius(18)
@@ -324,7 +326,7 @@ struct JourneyView: View {
         VStack(alignment: .leading, spacing: 0) {
             CornerArt(name: section.artName)
                 .scaledToFill()
-                .frame(height: 100)
+                .frame(height: ClayLayout.isPad(hSize, vSize) ? 150 : 100)
                 .frame(maxWidth: .infinity)
                 .clipped()
             HStack(spacing: 12) {

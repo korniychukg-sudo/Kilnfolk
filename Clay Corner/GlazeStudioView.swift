@@ -63,7 +63,7 @@ struct GlazeStudioView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let isWide = geo.size.width > geo.size.height * 1.15
+            let isWide = glazeIsWide(geo.size)
             ZStack {
                 Studio.linen.ignoresSafeArea()
                 if isWide {
@@ -109,7 +109,9 @@ struct GlazeStudioView: View {
                     Text("Wheel")
                         .font(.clayBody(14, .bold))
                         .foregroundColor(Studio.ink)
+                        .lineLimit(1)
                 }
+                .fixedSize()
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(Capsule().fill(Studio.card))
@@ -120,12 +122,16 @@ struct GlazeStudioView: View {
                 Text("Glaze Studio")
                     .font(.clayTitle(20))
                     .foregroundColor(Studio.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 Text(basePot.clay.displayName)
                     .font(.clayBody(11))
                     .foregroundColor(Studio.inkSoft)
+                    .lineLimit(1)
             }
+            .layoutPriority(1)
             Spacer()
-            Color.clear.frame(width: 82, height: 10)
+            Color.clear.frame(width: 74, height: 10)
         }
     }
 
@@ -157,9 +163,13 @@ struct GlazeStudioView: View {
         }
     }
 
+    private func glazeIsWide(_ size: CGSize) -> Bool {
+        size.width > size.height * 1.15
+    }
+
     private func potPreviewRect(_ size: CGSize) -> CGRect {
-        let w = min(size.width * 0.62, 250)
-        let h = min(size.height - 26, w * 1.25)
+        let w = min(size.width * 0.62, 380)
+        let h = min(size.height - 26, w * 1.3)
         return CGRect(x: (size.width - w) / 2, y: (size.height - h) / 2 + 6, width: w, height: h)
     }
 

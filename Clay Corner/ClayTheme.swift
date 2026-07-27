@@ -132,6 +132,18 @@ struct ClayChip: View {
     }
 }
 
+enum ClayLayout {
+    /// True only on iPad — an iPhone in landscape stays compact vertically.
+    static func isPad(_ horizontal: UserInterfaceSizeClass?, _ vertical: UserInterfaceSizeClass?) -> Bool {
+        horizontal == .regular && vertical == .regular
+    }
+
+    /// Banner art is cropped to its height, so give it more room on a wide iPad.
+    static func bannerHeight(_ horizontal: UserInterfaceSizeClass?, _ vertical: UserInterfaceSizeClass?) -> CGFloat {
+        isPad(horizontal, vertical) ? 210 : 150
+    }
+}
+
 /// Readable width on iPad-class screens while staying full-bleed on iPhone.
 struct ClayReadableWidth: ViewModifier {
     func body(content: Content) -> some View {

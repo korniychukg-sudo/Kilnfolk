@@ -9,6 +9,8 @@ struct KilnRevealData: Identifiable {
 struct KilnView: View {
     @EnvironmentObject var store: ClayStore
     @EnvironmentObject var journey: JourneyStore
+    @Environment(\.horizontalSizeClass) private var hSize
+    @Environment(\.verticalSizeClass) private var vSize
     @State private var reveal: KilnRevealData? = nil
 
     var body: some View {
@@ -18,7 +20,7 @@ struct KilnView: View {
                 VStack(spacing: 16) {
                     CornerArt(name: "kiln_banner")
                         .scaledToFill()
-                        .frame(height: 150)
+                        .frame(height: ClayLayout.bannerHeight(hSize, vSize))
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(22)
