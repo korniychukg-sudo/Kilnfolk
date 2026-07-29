@@ -31,7 +31,7 @@ struct OnboardingView: View {
                     if page < slides.count - 1 {
                         Button(action: onDone) {
                             Text("Skip")
-                                .font(.clayBody(14, .bold))
+                                .font(.folkBody(14, .bold))
                                 .foregroundColor(Studio.inkSoft)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 8)
@@ -46,7 +46,7 @@ struct OnboardingView: View {
 
                 Spacer(minLength: 0)
 
-                CornerArt(name: slides[page].art)
+                FolkArt(name: slides[page].art)
                     .scaledToFit()
                     .frame(maxWidth: 420)
                     .frame(maxHeight: 340)
@@ -57,11 +57,11 @@ struct OnboardingView: View {
 
                 VStack(spacing: 10) {
                     Text(slides[page].title)
-                        .font(.clayTitle(26))
+                        .font(.folkTitle(26))
                         .foregroundColor(Studio.ink)
                         .multilineTextAlignment(.center)
                     Text(slides[page].text)
-                        .font(.clayBody(15))
+                        .font(.folkBody(15))
                         .foregroundColor(Studio.inkSoft)
                         .multilineTextAlignment(.center)
                         .lineSpacing(3)
@@ -81,7 +81,7 @@ struct OnboardingView: View {
                 }
                 .padding(.bottom, 18)
 
-                ClayPrimaryButton(title: page == slides.count - 1 ? "Into the studio" : "Next") {
+                FolkPrimaryButton(title: page == slides.count - 1 ? "Into the studio" : "Next") {
                     if page == slides.count - 1 {
                         onDone()
                     } else {

@@ -23,16 +23,16 @@ enum Studio {
 // MARK: - Fonts
 
 extension Font {
-    static func clayTitle(_ size: CGFloat) -> Font { .system(size: size, weight: .bold, design: .rounded) }
-    static func clayBody(_ size: CGFloat, _ weight: Font.Weight = .medium) -> Font {
+    static func folkTitle(_ size: CGFloat) -> Font { .system(size: size, weight: .bold, design: .rounded) }
+    static func folkBody(_ size: CGFloat, _ weight: Font.Weight = .medium) -> Font {
         .system(size: size, weight: weight, design: .rounded)
     }
 }
 
 // MARK: - Art loading (Art/ folder reference, cached)
 
-final class CornerArtShelf {
-    static let shared = CornerArtShelf()
+final class FolkArtShelf {
+    static let shared = FolkArtShelf()
     private var cache: [String: UIImage] = [:]
     private let lock = NSLock()
 
@@ -47,12 +47,12 @@ final class CornerArtShelf {
 }
 
 /// Bundled painting; falls back to a tinted rectangle when a file is missing.
-struct CornerArt: View {
+struct FolkArt: View {
     let name: String
     var fallback: Color = Studio.linen
 
     var body: some View {
-        if let ui = CornerArtShelf.shared.image(name) {
+        if let ui = FolkArtShelf.shared.image(name) {
             Image(uiImage: ui).resizable()
         } else {
             fallback
@@ -62,7 +62,7 @@ struct CornerArt: View {
 
 // MARK: - Shared components
 
-struct ClayCard<Content: View>: View {
+struct FolkCard<Content: View>: View {
     var padding: CGFloat = 16
     @ViewBuilder var content: Content
 
@@ -77,18 +77,18 @@ struct ClayCard<Content: View>: View {
     }
 }
 
-struct ClaySectionHeader: View {
+struct FolkSectionHeader: View {
     let title: String
     var caption: String? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(title)
-                .font(.clayTitle(21))
+                .font(.folkTitle(21))
                 .foregroundColor(Studio.ink)
             if let caption = caption {
                 Text(caption)
-                    .font(.clayBody(13))
+                    .font(.folkBody(13))
                     .foregroundColor(Studio.inkSoft)
             }
         }
@@ -96,7 +96,7 @@ struct ClaySectionHeader: View {
     }
 }
 
-struct ClayPrimaryButton: View {
+struct FolkPrimaryButton: View {
     let title: String
     var tint: Color = Studio.terracotta
     var enabled: Bool = true
@@ -105,7 +105,7 @@ struct ClayPrimaryButton: View {
     var body: some View {
         Button(action: { if enabled { action() } }) {
             Text(title)
-                .font(.clayBody(17, .bold))
+                .font(.folkBody(17, .bold))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 15)
@@ -118,13 +118,13 @@ struct ClayPrimaryButton: View {
     }
 }
 
-struct ClayChip: View {
+struct FolkChip: View {
     let text: String
     var tint: Color = Studio.terracotta
 
     var body: some View {
         Text(text)
-            .font(.clayBody(12, .bold))
+            .font(.folkBody(12, .bold))
             .foregroundColor(tint)
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
@@ -132,7 +132,7 @@ struct ClayChip: View {
     }
 }
 
-enum ClayLayout {
+enum FolkLayout {
     /// True only on iPad — an iPhone in landscape stays compact vertically.
     static func isPad(_ horizontal: UserInterfaceSizeClass?, _ vertical: UserInterfaceSizeClass?) -> Bool {
         horizontal == .regular && vertical == .regular
@@ -145,7 +145,7 @@ enum ClayLayout {
 }
 
 /// Readable width on iPad-class screens while staying full-bleed on iPhone.
-struct ClayReadableWidth: ViewModifier {
+struct FolkReadableWidth: ViewModifier {
     func body(content: Content) -> some View {
         content.frame(maxWidth: 660)
             .frame(maxWidth: .infinity)
@@ -153,5 +153,5 @@ struct ClayReadableWidth: ViewModifier {
 }
 
 extension View {
-    func clayReadable() -> some View { modifier(ClayReadableWidth()) }
+    func folkReadable() -> some View { modifier(FolkReadableWidth()) }
 }

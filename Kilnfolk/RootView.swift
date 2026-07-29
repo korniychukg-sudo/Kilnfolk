@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RootView: View {
-    @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var store: FolkStore
     @State private var selectedTab = 0
 
     var body: some View {
@@ -59,12 +59,12 @@ struct RootView: View {
         store.firingJob != nil || !store.kilnQueue.isEmpty
     }
 
-    private func tabButton(index: Int, label: String, icon: ClayIconKind, badge: Bool = false) -> some View {
+    private func tabButton(index: Int, label: String, icon: FolkIconKind, badge: Bool = false) -> some View {
         let selected = selectedTab == index
         return Button(action: { selectedTab = index }) {
             VStack(spacing: 3) {
                 ZStack(alignment: .topTrailing) {
-                    ClayIcon(kind: icon, size: 24,
+                    FolkIcon(kind: icon, size: 24,
                              color: selected ? Studio.terracotta : Studio.ink.opacity(0.38))
                     if badge {
                         Circle()
@@ -74,7 +74,7 @@ struct RootView: View {
                     }
                 }
                 Text(label)
-                    .font(.clayBody(10, .bold))
+                    .font(.folkBody(10, .bold))
                     .foregroundColor(selected ? Studio.terracotta : Studio.ink.opacity(0.38))
             }
             .frame(maxWidth: .infinity)

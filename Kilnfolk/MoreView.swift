@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MoreView: View {
-    @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var store: FolkStore
     @EnvironmentObject var journey: JourneyStore
     @Environment(\.horizontalSizeClass) private var hSize
     @Environment(\.verticalSizeClass) private var vSize
@@ -13,19 +13,19 @@ struct MoreView: View {
             Studio.cream.ignoresSafeArea()
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 14) {
-                    CornerArt(name: "more_banner")
+                    FolkArt(name: "more_banner")
                         .scaledToFill()
-                        .frame(height: ClayLayout.bannerHeight(hSize, vSize) - 10)
+                        .frame(height: FolkLayout.bannerHeight(hSize, vSize) - 10)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(22)
                         .overlay(
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Clay Corner")
-                                    .font(.clayTitle(24))
+                                Text("Kilnfolk")
+                                    .font(.folkTitle(24))
                                     .foregroundColor(.white)
                                 Text("A tiny pottery studio in your pocket")
-                                    .font(.clayBody(13))
+                                    .font(.folkBody(13))
                                     .foregroundColor(.white.opacity(0.85))
                             }
                             .padding(14)
@@ -38,10 +38,10 @@ struct MoreView: View {
                         )
                         .padding(.top, 12)
 
-                    ClayCard(padding: 14) {
+                    FolkCard(padding: 14) {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("How your studio works")
-                                .font(.clayBody(15, .bold))
+                                .font(.folkBody(15, .bold))
                                 .foregroundColor(Studio.ink)
                             flowRow(icon: .wheel, text: "Shape a pot with one finger while the wheel spins")
                             flowRow(icon: .flag, text: "Throw the 12 classic forms and earn stars for accuracy")
@@ -51,12 +51,13 @@ struct MoreView: View {
                         }
                     }
 
-                    ClayCard(padding: 14) {
+                    FolkCard(padding: 14) {
                         VStack(spacing: 9) {
                             statRow(label: "Potter's rank", value: "\(journey.level) · \(journey.rankName)")
                             statRow(label: "Journey XP", value: "\(journey.state.xp)")
                             statRow(label: "Form stars", value: "\(journey.totalStars) of 36")
-                            statRow(label: "Daily streak", value: "\(journey.state.dailyStreak) days")
+                            statRow(label: "Daily streak",
+                                    value: "\(journey.state.dailyStreak) day\(journey.state.dailyStreak == 1 ? "" : "s")")
                             statRow(label: "Pieces thrown", value: "\(store.stats.thrown)")
                             statRow(label: "Pieces fired", value: "\(store.stats.fired)")
                             statRow(label: "On the shelf now", value: "\(store.galleryPots.count)")
@@ -66,12 +67,12 @@ struct MoreView: View {
 
                     Button(action: { showPrivacy = true }) {
                         HStack(spacing: 12) {
-                            ClayIcon(kind: .shield, size: 20, color: Studio.denim)
+                            FolkIcon(kind: .shield, size: 20, color: Studio.denim)
                             Text("Privacy Policy")
-                                .font(.clayBody(15, .bold))
+                                .font(.folkBody(15, .bold))
                                 .foregroundColor(Studio.ink)
                             Spacer()
-                            ClayIcon(kind: .chevronRight, size: 14, color: Studio.inkFaint)
+                            FolkIcon(kind: .chevronRight, size: 14, color: Studio.inkFaint)
                         }
                         .padding(14)
                         .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Studio.card))
@@ -80,9 +81,9 @@ struct MoreView: View {
 
                     Button(action: { confirmReset = true }) {
                         HStack(spacing: 12) {
-                            ClayIcon(kind: .reset, size: 20, color: Studio.ember)
+                            FolkIcon(kind: .reset, size: 20, color: Studio.ember)
                             Text("Start the studio over")
-                                .font(.clayBody(15, .bold))
+                                .font(.folkBody(15, .bold))
                                 .foregroundColor(Studio.ember)
                             Spacer()
                         }
@@ -91,18 +92,18 @@ struct MoreView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
 
-                    Text("Clay Corner 1.0 · made with mud and love")
-                        .font(.clayBody(12))
+                    Text("Kilnfolk 1.0 · made with mud and love")
+                        .font(.folkBody(12))
                         .foregroundColor(Studio.inkFaint)
                         .padding(.top, 6)
                 }
                 .padding(.horizontal, 18)
                 .padding(.bottom, 24)
-                .clayReadable()
+                .folkReadable()
             }
         }
         .sheet(isPresented: $showPrivacy) {
-            CornerWebPanel(urlString: "https://example.com")
+            FolkWebPanel(urlString: "https://example.com")
         }
         .alert(isPresented: $confirmReset) {
             Alert(title: Text("Start over?"),
@@ -115,12 +116,12 @@ struct MoreView: View {
         }
     }
 
-    private func flowRow(icon: ClayIconKind, text: String) -> some View {
+    private func flowRow(icon: FolkIconKind, text: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
-            ClayIcon(kind: icon, size: 18, color: Studio.terracotta)
+            FolkIcon(kind: icon, size: 18, color: Studio.terracotta)
                 .padding(.top, 1)
             Text(text)
-                .font(.clayBody(13))
+                .font(.folkBody(13))
                 .foregroundColor(Studio.inkSoft)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -129,11 +130,11 @@ struct MoreView: View {
     private func statRow(label: String, value: String) -> some View {
         HStack {
             Text(label)
-                .font(.clayBody(13))
+                .font(.folkBody(13))
                 .foregroundColor(Studio.inkSoft)
             Spacer()
             Text(value)
-                .font(.clayBody(14, .bold))
+                .font(.folkBody(14, .bold))
                 .foregroundColor(Studio.ink)
         }
     }

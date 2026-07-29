@@ -62,7 +62,7 @@ struct PotGeometry {
 
 // MARK: - Deterministic pseudo-random
 
-struct ClayRandom {
+struct FolkRandom {
     private var state: UInt64
     init(seed: UInt64) { state = seed == 0 ? 0x9E3779B9 : seed }
     mutating func next() -> Double {
@@ -209,7 +209,7 @@ enum PotPainter {
         let clayFlecks = pot.clay.speckled && pot.coat.baseGlazeID == nil
         guard wantsGlazeSpeckle || clayFlecks else { return }
 
-        var rng = ClayRandom(seed: pot.artSeed)
+        var rng = FolkRandom(seed: pot.artSeed)
         let count = 46
         var layer = ctx
         layer.clip(to: bodyPath)
@@ -249,7 +249,7 @@ enum PotPainter {
     }
 
     private static func drawCrackle(_ ctx: inout GraphicsContext, geo: PotGeometry, pot: PotDesign, bodyPath: Path) {
-        var rng = ClayRandom(seed: pot.artSeed ^ 0xC0FFEE)
+        var rng = FolkRandom(seed: pot.artSeed ^ 0xC0FFEE)
         var layer = ctx
         layer.clip(to: bodyPath)
         for _ in 0..<13 {

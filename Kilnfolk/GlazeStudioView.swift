@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Glaze Studio
 
 struct GlazeStudioView: View {
-    @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var store: FolkStore
     @EnvironmentObject var journey: JourneyStore
 
     let basePot: PotDesign
@@ -91,7 +91,7 @@ struct GlazeStudioView: View {
                             controlPanel
                                 .padding(.horizontal, 18)
                                 .padding(.bottom, 16)
-                                .clayReadable()
+                                .folkReadable()
                         }
                     }
                 }
@@ -105,9 +105,9 @@ struct GlazeStudioView: View {
         HStack(spacing: 10) {
             Button(action: onReturn) {
                 HStack(spacing: 5) {
-                    ClayIcon(kind: .chevronLeft, size: 15, color: Studio.ink)
+                    FolkIcon(kind: .chevronLeft, size: 15, color: Studio.ink)
                     Text("Wheel")
-                        .font(.clayBody(14, .bold))
+                        .font(.folkBody(14, .bold))
                         .foregroundColor(Studio.ink)
                         .lineLimit(1)
                 }
@@ -120,12 +120,12 @@ struct GlazeStudioView: View {
             Spacer()
             VStack(spacing: 1) {
                 Text("Glaze Studio")
-                    .font(.clayTitle(20))
+                    .font(.folkTitle(20))
                     .foregroundColor(Studio.ink)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                 Text(basePot.clay.displayName)
-                    .font(.clayBody(11))
+                    .font(.folkBody(11))
                     .foregroundColor(Studio.inkSoft)
                     .lineLimit(1)
             }
@@ -150,7 +150,7 @@ struct GlazeStudioView: View {
                 }
                 if mode == .bands {
                     Text(coat.bands.count >= 6 ? "Six bands is plenty — remove one below" : "Drag on the pot to paint a band")
-                        .font(.clayBody(11, .bold))
+                        .font(.folkBody(11, .bold))
                         .foregroundColor(Studio.inkSoft)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
@@ -202,7 +202,7 @@ struct GlazeStudioView: View {
             paletteRow
             modeDetails
             nameField
-            ClayPrimaryButton(title: "Into the kiln", tint: Studio.ember) {
+            FolkPrimaryButton(title: "Into the kiln", tint: Studio.ember) {
                 var pot = basePot
                 pot.coat = coat
                 pot.name = potName
@@ -219,7 +219,7 @@ struct GlazeStudioView: View {
                 let selected = mode == m
                 Button(action: { mode = m }) {
                     Text(m.label)
-                        .font(.clayBody(13, .bold))
+                        .font(.folkBody(13, .bold))
                         .foregroundColor(selected ? .white : Studio.inkSoft)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 9)
@@ -249,7 +249,7 @@ struct GlazeStudioView: View {
                 }
                 if let hint = lockHint {
                     Text(hint)
-                        .font(.clayBody(11, .bold))
+                        .font(.folkBody(11, .bold))
                         .foregroundColor(Studio.denim)
                         .transition(.opacity)
                 }
@@ -308,9 +308,9 @@ struct GlazeStudioView: View {
                     Group {
                         if !unlocked {
                             VStack(spacing: 0) {
-                                ClayIcon(kind: .shield, size: 13, color: Studio.denim)
+                                FolkIcon(kind: .shield, size: 13, color: Studio.denim)
                                 Text("\(journey.glazeUnlockLevel(glaze.id))")
-                                    .font(.clayBody(9, .bold))
+                                    .font(.folkBody(9, .bold))
                                     .foregroundColor(Studio.denim)
                             }
                             .padding(5)
@@ -319,7 +319,7 @@ struct GlazeStudioView: View {
                     }
                 )
                 Text(glaze.name)
-                    .font(.clayBody(10, .bold))
+                    .font(.folkBody(10, .bold))
                     .foregroundColor(unlocked ? (selected ? Studio.ink : Studio.inkSoft) : Studio.inkFaint)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -333,22 +333,22 @@ struct GlazeStudioView: View {
     private var modeDetails: some View {
         switch mode {
         case .base:
-            ClayCard(padding: 12) {
+            FolkCard(padding: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Base dip")
-                            .font(.clayBody(14, .bold))
+                            .font(.folkBody(14, .bold))
                             .foregroundColor(Studio.ink)
                         Text(coat.baseGlazeID == nil
                              ? "Bare clay — tap a glaze above to dip the whole pot"
                              : "Dipped in \(GlazeCatalog.recipe(coat.baseGlazeID)?.name ?? "")")
-                            .font(.clayBody(12))
+                            .font(.folkBody(12))
                             .foregroundColor(Studio.inkSoft)
                     }
                     Spacer()
                     if coat.baseGlazeID != nil {
                         Button(action: { coat.baseGlazeID = nil }) {
-                            ClayChip(text: "Bare clay", tint: Studio.denim)
+                            FolkChip(text: "Bare clay", tint: Studio.denim)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
@@ -361,7 +361,7 @@ struct GlazeStudioView: View {
                         let selected = bandWidth == bw
                         Button(action: { bandWidth = bw }) {
                             Text(bw.label)
-                                .font(.clayBody(12, .bold))
+                                .font(.folkBody(12, .bold))
                                 .foregroundColor(selected ? .white : Studio.inkSoft)
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 7)
@@ -379,14 +379,14 @@ struct GlazeStudioView: View {
                                     .fill(GlazeCatalog.recipe(band.glazeID)?.fired.color ?? Studio.linen)
                                     .frame(width: 18, height: 18)
                                 Text(GlazeCatalog.recipe(band.glazeID)?.name ?? "Band")
-                                    .font(.clayBody(13, .bold))
+                                    .font(.folkBody(13, .bold))
                                     .foregroundColor(Studio.ink)
                                 Text(heightWord(band.center))
-                                    .font(.clayBody(12))
+                                    .font(.folkBody(12))
                                     .foregroundColor(Studio.inkSoft)
                                 Spacer()
                                 Button(action: { coat.bands.removeAll { $0.id == band.id } }) {
-                                    ClayIcon(kind: .close, size: 14, color: Studio.inkSoft)
+                                    FolkIcon(kind: .close, size: 14, color: Studio.inkSoft)
                                         .padding(6)
                                         .background(Circle().fill(Studio.linen))
                                 }
@@ -400,22 +400,22 @@ struct GlazeStudioView: View {
                 }
             }
         case .rim:
-            ClayCard(padding: 12) {
+            FolkCard(padding: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Rim dip")
-                            .font(.clayBody(14, .bold))
+                            .font(.folkBody(14, .bold))
                             .foregroundColor(Studio.ink)
                         Text(coat.rimDipGlazeID == nil
                              ? "Tap a glaze above to dip just the rim"
                              : "Rim dipped in \(GlazeCatalog.recipe(coat.rimDipGlazeID)?.name ?? "")")
-                            .font(.clayBody(12))
+                            .font(.folkBody(12))
                             .foregroundColor(Studio.inkSoft)
                     }
                     Spacer()
                     if coat.rimDipGlazeID != nil {
                         Button(action: { coat.rimDipGlazeID = nil }) {
-                            ClayChip(text: "Remove", tint: Studio.denim)
+                            FolkChip(text: "Remove", tint: Studio.denim)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
@@ -423,14 +423,14 @@ struct GlazeStudioView: View {
             }
         case .extras:
             VStack(spacing: 10) {
-                ClayCard(padding: 12) {
+                FolkCard(padding: 12) {
                     HStack {
                         VStack(alignment: .leading, spacing: 3) {
                             Text("Speckle dust")
-                                .font(.clayBody(14, .bold))
+                                .font(.folkBody(14, .bold))
                                 .foregroundColor(Studio.ink)
                             Text("A pinch of iron flecks scattered over the glaze")
-                                .font(.clayBody(12))
+                                .font(.folkBody(12))
                                 .foregroundColor(Studio.inkSoft)
                         }
                         Spacer()
@@ -451,7 +451,7 @@ struct GlazeStudioView: View {
                 }
                 Button(action: { coat = GlazeCoat() }) {
                     Text("Wash off all glaze")
-                        .font(.clayBody(13, .bold))
+                        .font(.folkBody(13, .bold))
                         .foregroundColor(Studio.denim)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 11)
@@ -473,9 +473,9 @@ struct GlazeStudioView: View {
 
     private var nameField: some View {
         HStack(spacing: 10) {
-            ClayIcon(kind: .sparkle, size: 16, color: Studio.honey)
+            FolkIcon(kind: .sparkle, size: 16, color: Studio.honey)
             TextField("Name your piece (optional)", text: $potName)
-                .font(.clayBody(15))
+                .font(.folkBody(15))
                 .foregroundColor(Studio.ink)
                 .disableAutocorrection(true)
         }

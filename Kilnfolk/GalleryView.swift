@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct GalleryView: View {
-    @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var store: FolkStore
     @Environment(\.horizontalSizeClass) private var hSize
     @Environment(\.verticalSizeClass) private var vSize
     @State private var filter: GalleryFilter = .all
@@ -26,19 +26,19 @@ struct GalleryView: View {
                 Studio.cream.ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
-                        CornerArt(name: "gallery_banner")
+                        FolkArt(name: "gallery_banner")
                             .scaledToFill()
-                            .frame(height: ClayLayout.bannerHeight(hSize, vSize))
+                            .frame(height: FolkLayout.bannerHeight(hSize, vSize))
                             .frame(maxWidth: .infinity)
                             .clipped()
                             .cornerRadius(22)
                             .overlay(
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("The Gallery")
-                                        .font(.clayTitle(26))
+                                        .font(.folkTitle(26))
                                         .foregroundColor(.white)
                                     Text("Every piece you have fired")
-                                        .font(.clayBody(13))
+                                        .font(.folkBody(13))
                                         .foregroundColor(.white.opacity(0.85))
                                 }
                                 .padding(14)
@@ -68,7 +68,7 @@ struct GalleryView: View {
                     .padding(.horizontal, 18)
                     .padding(.top, 12)
                     .padding(.bottom, 24)
-                    .clayReadable()
+                    .folkReadable()
                 }
             }
         }
@@ -84,10 +84,10 @@ struct GalleryView: View {
     private func statChip(value: Int, word: String) -> some View {
         HStack(spacing: 5) {
             Text("\(value)")
-                .font(.clayBody(15, .bold))
+                .font(.folkBody(15, .bold))
                 .foregroundColor(Studio.ink)
             Text(word)
-                .font(.clayBody(12))
+                .font(.folkBody(12))
                 .foregroundColor(Studio.inkSoft)
         }
         .padding(.horizontal, 12)
@@ -101,7 +101,7 @@ struct GalleryView: View {
                 let selected = filter == f
                 Button(action: { filter = f }) {
                     Text(f.label)
-                        .font(.clayBody(13, .bold))
+                        .font(.folkBody(13, .bold))
                         .foregroundColor(selected ? .white : Studio.inkSoft)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
@@ -115,19 +115,19 @@ struct GalleryView: View {
     }
 
     private var emptyState: some View {
-        ClayCard {
+        FolkCard {
             VStack(spacing: 10) {
-                CornerArt(name: "gallery_empty")
+                FolkArt(name: "gallery_empty")
                     .scaledToFit()
                     .frame(height: 140)
                     .cornerRadius(16)
                 Text(filter == .favorites ? "No favorites yet" : "The shelf is waiting")
-                    .font(.clayBody(16, .bold))
+                    .font(.folkBody(16, .bold))
                     .foregroundColor(Studio.ink)
                 Text(filter == .favorites
                      ? "Tap the star on a piece you love and it will live here."
                      : "Fire your first piece and it will take pride of place right here.")
-                    .font(.clayBody(13))
+                    .font(.folkBody(13))
                     .foregroundColor(Studio.inkSoft)
                     .multilineTextAlignment(.center)
             }
@@ -152,7 +152,7 @@ struct GalleryView: View {
             // GeometryReader pins the panel art to the shelves' own size; a bare
             // scaledToFill background grows to a square and covers its neighbours.
             GeometryReader { panel in
-                CornerArt(name: "cabinet_back", fallback: Studio.linen)
+                FolkArt(name: "cabinet_back", fallback: Studio.linen)
                     .scaledToFill()
                     .frame(width: panel.size.width, height: panel.size.height)
                     .clipped()
@@ -177,7 +177,7 @@ struct GalleryView: View {
                 }
             }
             .padding(.horizontal, 8)
-            CornerArt(name: "wood_shelf", fallback: Studio.wood)
+            FolkArt(name: "wood_shelf", fallback: Studio.wood)
                 .frame(height: 16)
                 .frame(maxWidth: .infinity)
                 .cornerRadius(4)
@@ -198,16 +198,16 @@ struct GalleryView: View {
                         .frame(height: 106)
                         .frame(maxWidth: .infinity)
                     if pot.favorite {
-                        ClayIcon(kind: .starFill, size: 15, color: Studio.honey)
+                        FolkIcon(kind: .starFill, size: 15, color: Studio.honey)
                             .padding(3)
                     }
                 }
                 HStack(spacing: 3) {
                     if let stars = pot.formStars, stars > 0, pot.formID != nil {
-                        ClayIcon(kind: .starFill, size: 9, color: Studio.honey)
+                        FolkIcon(kind: .starFill, size: 9, color: Studio.honey)
                     }
                     Text(shelfLabel(pot))
-                        .font(.clayBody(11, .bold))
+                        .font(.folkBody(11, .bold))
                         .foregroundColor(.white.opacity(0.85))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
@@ -230,7 +230,7 @@ struct GalleryView: View {
 // MARK: - Detail sheet
 
 struct PotDetailSheet: View {
-    @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var store: FolkStore
     let potID: UUID
     let onClose: () -> Void
 
@@ -249,7 +249,7 @@ struct PotDetailSheet: View {
                         HStack {
                             Spacer()
                             Button(action: onClose) {
-                                ClayIcon(kind: .close, size: 17, color: Studio.ink)
+                                FolkIcon(kind: .close, size: 17, color: Studio.ink)
                                     .padding(9)
                                     .background(Circle().fill(Studio.card))
                             }
@@ -273,21 +273,21 @@ struct PotDetailSheet: View {
                             )
 
                         Text("Drag the pot to spin it")
-                            .font(.clayBody(11))
+                            .font(.folkBody(11))
                             .foregroundColor(Studio.inkFaint)
 
                         HStack(spacing: 10) {
-                            ClayIcon(kind: .sparkle, size: 16, color: Studio.honey)
+                            FolkIcon(kind: .sparkle, size: 16, color: Studio.honey)
                             TextField("Untitled Piece", text: $editingName, onCommit: {
                                 store.renamePot(pot.id, to: editingName)
                             })
-                            .font(.clayBody(16, .bold))
+                            .font(.folkBody(16, .bold))
                             .foregroundColor(Studio.ink)
                             .disableAutocorrection(true)
                             Button(action: {
                                 store.toggleFavorite(pot.id)
                             }) {
-                                ClayIcon(kind: pot.favorite ? .starFill : .star, size: 20,
+                                FolkIcon(kind: pot.favorite ? .starFill : .star, size: 20,
                                          color: pot.favorite ? Studio.honey : Studio.inkFaint)
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -296,20 +296,20 @@ struct PotDetailSheet: View {
                         .padding(.vertical, 12)
                         .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Studio.card))
 
-                        ClayCard(padding: 14) {
+                        FolkCard(padding: 14) {
                             VStack(spacing: 9) {
                                 if let form = FormLibrary.form(pot.formID) {
                                     HStack {
                                         Text("Classic form")
-                                            .font(.clayBody(13))
+                                            .font(.folkBody(13))
                                             .foregroundColor(Studio.inkSoft)
                                         Spacer()
                                         HStack(spacing: 4) {
                                             Text(form.name)
-                                                .font(.clayBody(13, .bold))
+                                                .font(.folkBody(13, .bold))
                                                 .foregroundColor(Studio.ink)
                                             ForEach(0..<max(0, min(3, pot.formStars ?? 0)), id: \.self) { _ in
-                                                ClayIcon(kind: .starFill, size: 11, color: Studio.honey)
+                                                FolkIcon(kind: .starFill, size: 11, color: Studio.honey)
                                             }
                                         }
                                     }
@@ -334,9 +334,9 @@ struct PotDetailSheet: View {
 
                         Button(action: { confirmDelete = true }) {
                             HStack(spacing: 8) {
-                                ClayIcon(kind: .trash, size: 16, color: Studio.ember)
+                                FolkIcon(kind: .trash, size: 16, color: Studio.ember)
                                 Text("Shatter this piece")
-                                    .font(.clayBody(14, .bold))
+                                    .font(.folkBody(14, .bold))
                                     .foregroundColor(Studio.ember)
                             }
                             .frame(maxWidth: .infinity)
@@ -347,7 +347,7 @@ struct PotDetailSheet: View {
                         .padding(.bottom, 24)
                     }
                     .padding(.horizontal, 20)
-                    .clayReadable()
+                    .folkReadable()
                 }
                 .onAppear {
                     if !nameLoaded {
@@ -377,11 +377,11 @@ struct PotDetailSheet: View {
     private func infoRow(label: String, value: String) -> some View {
         HStack(alignment: .top) {
             Text(label)
-                .font(.clayBody(13))
+                .font(.folkBody(13))
                 .foregroundColor(Studio.inkSoft)
             Spacer()
             Text(value)
-                .font(.clayBody(13, .bold))
+                .font(.folkBody(13, .bold))
                 .foregroundColor(Studio.ink)
                 .multilineTextAlignment(.trailing)
         }

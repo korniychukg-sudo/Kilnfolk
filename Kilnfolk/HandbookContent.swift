@@ -43,7 +43,7 @@ enum HandbookLibrary {
                          text: "Thumbs press down into the centered mound to make the first hollow. The floor of the pot is set now: press too deep and the wheel head says hello through the bottom.",
                          artName: "tech_03", stepNumber: 3),
             HandbookItem(id: "pull", title: "Pulling up the walls",
-                         text: "Fingertips inside and out squeeze the wall gently while the wheel turns, and the clay rises between them. Three good pulls can triple a pot's height. In Clay Corner, the Lift tool does exactly this.",
+                         text: "Fingertips inside and out squeeze the wall gently while the wheel turns, and the clay rises between them. Three good pulls can triple a pot's height. In Kilnfolk, the Lift tool does exactly this.",
                          artName: "tech_04", stepNumber: 4),
             HandbookItem(id: "shape", title: "Shaping",
                          text: "With the walls up, a light touch swells the belly outward or necks the rim inward. The pot finds its character here — this is the part you do with a fingertip on the glass.",

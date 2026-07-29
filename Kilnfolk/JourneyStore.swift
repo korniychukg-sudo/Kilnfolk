@@ -66,7 +66,7 @@ final class JourneyStore: ObservableObject {
     @Published private(set) var state = JourneyState()
     @Published var activeFormID: String? = nil
 
-    private let key = "corner.journey.v1"
+    private let key = "kilnfolk.journey.v1"
 
     static let ranks: [PotterRank] = [
         PotterRank(level: 1, name: "New Hands", xp: 0),

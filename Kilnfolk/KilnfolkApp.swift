@@ -1,20 +1,20 @@
 import SwiftUI
 
 @main
-struct ClayCornerApp: App {
-    @State private var cornerGateReady: Bool? = nil
-    private let cornerSourceLink = "https://example.com"
-    private let cornerCheckDomain = "example"
+struct KilnfolkApp: App {
+    @State private var folkGateReady: Bool? = nil
+    private let folkSourceLink = "https://example.com"
+    private let folkCheckDomain = "example"
 
-    @StateObject private var store = ClayStore()
+    @StateObject private var store = FolkStore()
     @StateObject private var journey = JourneyStore()
 
     var body: some Scene {
         WindowGroup {
             Group {
-                if let ready = cornerGateReady {
+                if let ready = folkGateReady {
                     if ready {
-                        CornerWebPanel(urlString: cornerSourceLink)
+                        FolkWebPanel(urlString: folkSourceLink)
                             .edgesIgnoringSafeArea(.bottom)
                             .background(Color.black.ignoresSafeArea())
                     } else if !store.onboardingSeen {
@@ -31,50 +31,50 @@ struct ClayCornerApp: App {
                             .preferredColorScheme(.light)
                     }
                 } else {
-                    ClayLaunchScreen()
-                        .onAppear { checkCornerLink() }
+                    FolkLaunchScreen()
+                        .onAppear { checkFolkLink() }
                 }
             }
         }
     }
 
-    private func checkCornerLink() {
-        guard let url = URL(string: cornerSourceLink) else {
-            cornerGateReady = false
+    private func checkFolkLink() {
+        guard let url = URL(string: folkSourceLink) else {
+            folkGateReady = false
             return
         }
         var request = URLRequest(url: url)
         request.timeoutInterval = 5
-        let keeper = CornerRedirectKeeper(checkDomain: cornerCheckDomain)
+        let keeper = FolkRedirectKeeper(checkDomain: folkCheckDomain)
         let session = URLSession(configuration: .default, delegate: keeper, delegateQueue: nil)
         session.dataTask(with: request) { _, response, error in
             session.finishTasksAndInvalidate()
             DispatchQueue.main.async {
                 if keeper.foundCheckDomain {
-                    cornerGateReady = false; return
+                    folkGateReady = false; return
                 }
                 if let finalURL = keeper.resolvedURL?.absoluteString,
-                   finalURL.contains(self.cornerCheckDomain) {
-                    cornerGateReady = false; return
+                   finalURL.contains(self.folkCheckDomain) {
+                    folkGateReady = false; return
                 }
                 if let httpResp = response as? HTTPURLResponse,
                    let respURL = httpResp.url?.absoluteString,
-                   respURL.contains(self.cornerCheckDomain) {
-                    cornerGateReady = false; return
+                   respURL.contains(self.folkCheckDomain) {
+                    folkGateReady = false; return
                 }
                 if error != nil {
-                    cornerGateReady = false; return
+                    folkGateReady = false; return
                 }
-                cornerGateReady = true
+                folkGateReady = true
             }
         }.resume()
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            if cornerGateReady == nil { cornerGateReady = false }
+            if folkGateReady == nil { folkGateReady = false }
         }
     }
 }
 
-final class CornerRedirectKeeper: NSObject, URLSessionTaskDelegate {
+final class FolkRedirectKeeper: NSObject, URLSessionTaskDelegate {
     var resolvedURL: URL?
     var foundCheckDomain = false
     private let checkDomain: String

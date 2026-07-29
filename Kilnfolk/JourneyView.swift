@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct JourneyView: View {
-    @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var store: FolkStore
     @EnvironmentObject var journey: JourneyStore
     @Environment(\.horizontalSizeClass) private var hSize
     @Environment(\.verticalSizeClass) private var vSize
@@ -25,7 +25,7 @@ struct JourneyView: View {
             Studio.cream.ignoresSafeArea()
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 14) {
-                    ClaySectionHeader(title: "Potter's Journey",
+                    FolkSectionHeader(title: "Potter's Journey",
                                       caption: "Master the classic forms, rank by rank")
                         .padding(.top, 12)
 
@@ -39,7 +39,7 @@ struct JourneyView: View {
                 }
                 .padding(.horizontal, 18)
                 .padding(.bottom, 24)
-                .clayReadable()
+                .folkReadable()
             }
         }
         .navigationBarHidden(true)
@@ -51,7 +51,7 @@ struct JourneyView: View {
                 let selected = segment == s
                 Button(action: { segment = s }) {
                     Text(s.label)
-                        .font(.clayBody(13, .bold))
+                        .font(.folkBody(13, .bold))
                         .foregroundColor(selected ? .white : Studio.inkSoft)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 9)
@@ -77,7 +77,7 @@ struct JourneyView: View {
     }
 
     private var rankCard: some View {
-        ClayCard(padding: 14) {
+        FolkCard(padding: 14) {
             HStack(spacing: 14) {
                 ZStack {
                     Circle()
@@ -89,26 +89,26 @@ struct JourneyView: View {
                         .frame(width: 66, height: 66)
                         .rotationEffect(.degrees(-90))
                     Text("\(journey.level)")
-                        .font(.clayTitle(22))
+                        .font(.folkTitle(22))
                         .foregroundColor(Studio.ink)
                 }
                 VStack(alignment: .leading, spacing: 3) {
                     Text(journey.rankName)
-                        .font(.clayBody(16, .bold))
+                        .font(.folkBody(16, .bold))
                         .foregroundColor(Studio.ink)
                     if let next = journey.nextRank {
                         Text("\(journey.state.xp) XP · \(next.xp - journey.state.xp) to \(next.name)")
-                            .font(.clayBody(12))
+                            .font(.folkBody(12))
                             .foregroundColor(Studio.inkSoft)
                     } else {
                         Text("\(journey.state.xp) XP · the wheel holds no more secrets")
-                            .font(.clayBody(12))
+                            .font(.folkBody(12))
                             .foregroundColor(Studio.inkSoft)
                     }
                     HStack(spacing: 6) {
-                        ClayIcon(kind: .starFill, size: 13, color: Studio.honey)
+                        FolkIcon(kind: .starFill, size: 13, color: Studio.honey)
                         Text("\(journey.totalStars) stars earned")
-                            .font(.clayBody(12, .bold))
+                            .font(.folkBody(12, .bold))
                             .foregroundColor(Studio.inkSoft)
                     }
                 }
@@ -120,35 +120,35 @@ struct JourneyView: View {
     private var dailyCard: some View {
         let form = journey.formOfTheDay()
         let done = journey.dailyDone()
-        return ClayCard(padding: 14) {
+        return FolkCard(padding: 14) {
             HStack(spacing: 14) {
                 formThumb(form, size: CGSize(width: 58, height: 72))
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
-                        ClayIcon(kind: .sparkle, size: 13, color: Studio.honey)
+                        FolkIcon(kind: .sparkle, size: 13, color: Studio.honey)
                         Text("Form of the day")
-                            .font(.clayBody(11, .bold))
+                            .font(.folkBody(11, .bold))
                             .foregroundColor(Studio.honey)
                     }
                     Text(form.name)
-                        .font(.clayBody(16, .bold))
+                        .font(.folkBody(16, .bold))
                         .foregroundColor(Studio.ink)
                     if journey.state.dailyStreak > 0 {
                         HStack(spacing: 4) {
-                            ClayIcon(kind: .flame, size: 12, color: Studio.ember)
+                            FolkIcon(kind: .flame, size: 12, color: Studio.ember)
                             Text("\(journey.state.dailyStreak)-day streak")
-                                .font(.clayBody(12))
+                                .font(.folkBody(12))
                                 .foregroundColor(Studio.inkSoft)
                         }
                     } else {
                         Text("Throw it today to start a streak")
-                            .font(.clayBody(12))
+                            .font(.folkBody(12))
                             .foregroundColor(Studio.inkSoft)
                     }
                 }
                 Spacer()
                 if done {
-                    ClayChip(text: "Done today", tint: Studio.sage)
+                    FolkChip(text: "Done today", tint: Studio.sage)
                 } else {
                     startButton(form)
                 }
@@ -162,16 +162,16 @@ struct JourneyView: View {
         return VStack(spacing: 10) {
             HStack {
                 Text(FormLibrary.tierName(tier))
-                    .font(.clayBody(15, .bold))
+                    .font(.folkBody(15, .bold))
                     .foregroundColor(Studio.ink)
                 if !unlocked {
-                    ClayChip(text: "\(needed) stars to unlock", tint: Studio.denim)
+                    FolkChip(text: "\(needed) stars to unlock", tint: Studio.denim)
                 }
                 Spacer()
                 HStack(spacing: 3) {
-                    ClayIcon(kind: .starFill, size: 11, color: Studio.honey)
+                    FolkIcon(kind: .starFill, size: 11, color: Studio.honey)
                     Text("\(FormLibrary.forms(inTier: tier).reduce(0) { $0 + journey.stars(for: $1.id) }) of 9")
-                        .font(.clayBody(12, .bold))
+                        .font(.folkBody(12, .bold))
                         .foregroundColor(Studio.inkSoft)
                 }
             }
@@ -185,29 +185,29 @@ struct JourneyView: View {
     private func formCard(_ form: PotForm, tierUnlocked: Bool) -> some View {
         let stars = journey.stars(for: form.id)
         let best = journey.bestFit(for: form.id)
-        return ClayCard(padding: 12) {
+        return FolkCard(padding: 12) {
             HStack(spacing: 12) {
                 formThumb(form, size: CGSize(width: 52, height: 66))
                     .opacity(tierUnlocked ? 1 : 0.35)
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 6) {
                         Text(form.name)
-                            .font(.clayBody(15, .bold))
+                            .font(.folkBody(15, .bold))
                             .foregroundColor(tierUnlocked ? Studio.ink : Studio.inkSoft)
                         HStack(spacing: 2) {
                             ForEach(0..<3, id: \.self) { i in
-                                ClayIcon(kind: i < stars ? .starFill : .star, size: 11,
+                                FolkIcon(kind: i < stars ? .starFill : .star, size: 11,
                                          color: i < stars ? Studio.honey : Studio.inkFaint)
                             }
                         }
                     }
                     Text(tierUnlocked ? form.story : "Earn more stars in earlier tiers to reveal this form.")
-                        .font(.clayBody(11.5))
+                        .font(.folkBody(11.5))
                         .foregroundColor(Studio.inkSoft)
                         .fixedSize(horizontal: false, vertical: true)
                     if let best = best, tierUnlocked {
                         Text("Best fit \(Int((best * 100).rounded()))%")
-                            .font(.clayBody(11, .bold))
+                            .font(.folkBody(11, .bold))
                             .foregroundColor(Studio.sage)
                     }
                 }
@@ -226,7 +226,7 @@ struct JourneyView: View {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }) {
             Text(journey.activeFormID == form.id ? "On wheel" : "Throw")
-                .font(.clayBody(12, .bold))
+                .font(.folkBody(12, .bold))
                 .foregroundColor(.white)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
@@ -247,15 +247,15 @@ struct JourneyView: View {
 
     private var awardsSection: some View {
         VStack(spacing: 12) {
-            CornerArt(name: "awards_banner")
+            FolkArt(name: "awards_banner")
                 .scaledToFill()
-                .frame(height: ClayLayout.isPad(hSize, vSize) ? 170 : 110)
+                .frame(height: FolkLayout.isPad(hSize, vSize) ? 170 : 110)
                 .frame(maxWidth: .infinity)
                 .clipped()
                 .cornerRadius(18)
             let earned = JourneyStore.badgeDefs.filter { journey.hasBadge($0.id) }.count
             Text("\(earned) of \(JourneyStore.badgeDefs.count) awards earned")
-                .font(.clayBody(13, .bold))
+                .font(.folkBody(13, .bold))
                 .foregroundColor(Studio.inkSoft)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
                 ForEach(JourneyStore.badgeDefs) { badge in
@@ -276,16 +276,16 @@ struct JourneyView: View {
                     .stroke(earned ? Studio.honey : Studio.inkFaint,
                             style: StrokeStyle(lineWidth: 2.5, dash: earned ? [] : [4, 4]))
                     .frame(width: 56, height: 56)
-                ClayIcon(kind: earned ? .starFill : .star, size: 24,
+                FolkIcon(kind: earned ? .starFill : .star, size: 24,
                          color: earned ? Studio.honey : Studio.inkFaint)
             }
             Text(badge.title)
-                .font(.clayBody(13, .bold))
+                .font(.folkBody(13, .bold))
                 .foregroundColor(earned ? Studio.ink : Studio.inkSoft)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
             Text(earned ? earnedText(badge) : badge.hint)
-                .font(.clayBody(11))
+                .font(.folkBody(11))
                 .foregroundColor(Studio.inkSoft)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -324,23 +324,23 @@ struct JourneyView: View {
 
     private func loreCard(_ section: HandbookSection) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            CornerArt(name: section.artName)
+            FolkArt(name: section.artName)
                 .scaledToFill()
-                .frame(height: ClayLayout.isPad(hSize, vSize) ? 150 : 100)
+                .frame(height: FolkLayout.isPad(hSize, vSize) ? 150 : 100)
                 .frame(maxWidth: .infinity)
                 .clipped()
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(section.title)
-                        .font(.clayBody(15, .bold))
+                        .font(.folkBody(15, .bold))
                         .foregroundColor(Studio.ink)
                     Text(section.caption)
-                        .font(.clayBody(12))
+                        .font(.folkBody(12))
                         .foregroundColor(Studio.inkSoft)
                 }
                 Spacer()
-                ClayChip(text: "\(section.items.count) notes", tint: Studio.terracotta)
-                ClayIcon(kind: .chevronRight, size: 14, color: Studio.inkFaint)
+                FolkChip(text: "\(section.items.count) notes", tint: Studio.terracotta)
+                FolkIcon(kind: .chevronRight, size: 14, color: Studio.inkFaint)
             }
             .padding(13)
             .background(Studio.card)

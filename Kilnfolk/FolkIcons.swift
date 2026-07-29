@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Icon kinds
 
-enum ClayIconKind {
+enum FolkIconKind {
     case wheel, kiln, shelf, book, dots
     case hand, sponge, rib, pull
     case undo, reset, star, starFill, trash, close, check, plus, chevronRight, chevronLeft
@@ -10,8 +10,8 @@ enum ClayIconKind {
 }
 
 /// All in-app iconography is drawn by hand — no system symbols anywhere.
-struct ClayIcon: View {
-    let kind: ClayIconKind
+struct FolkIcon: View {
+    let kind: FolkIconKind
     var size: CGFloat = 22
     var color: Color = Studio.ink
     var lineWidth: CGFloat? = nil

@@ -14,19 +14,19 @@ struct HandbookSectionView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     ZStack(alignment: .topLeading) {
-                        CornerArt(name: section.artName)
+                        FolkArt(name: section.artName)
                             .scaledToFill()
-                            .frame(height: ClayLayout.isPad(hSize, vSize) ? 240 : 170)
+                            .frame(height: FolkLayout.isPad(hSize, vSize) ? 240 : 170)
                             .frame(maxWidth: .infinity)
                             .clipped()
                             .cornerRadius(22)
                             .overlay(
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(section.title)
-                                        .font(.clayTitle(24))
+                                        .font(.folkTitle(24))
                                         .foregroundColor(.white)
                                     Text(section.caption)
-                                        .font(.clayBody(13))
+                                        .font(.folkBody(13))
                                         .foregroundColor(.white.opacity(0.85))
                                 }
                                 .padding(14)
@@ -39,9 +39,9 @@ struct HandbookSectionView: View {
                             )
                         Button(action: { presentationMode.wrappedValue.dismiss() }) {
                             HStack(spacing: 4) {
-                                ClayIcon(kind: .chevronLeft, size: 13, color: .white)
+                                FolkIcon(kind: .chevronLeft, size: 13, color: .white)
                                 Text("Handbook")
-                                    .font(.clayBody(12, .bold))
+                                    .font(.folkBody(12, .bold))
                                     .foregroundColor(.white)
                             }
                             .padding(.horizontal, 11)
@@ -53,12 +53,12 @@ struct HandbookSectionView: View {
                     }
 
                     Text(section.intro)
-                        .font(.clayBody(14))
+                        .font(.folkBody(14))
                         .foregroundColor(Studio.ink.opacity(0.85))
                         .lineSpacing(3)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    ClaySectionHeader(title: section.itemsHeading)
+                    FolkSectionHeader(title: section.itemsHeading)
 
                     ForEach(section.items) { item in
                         itemCard(item)
@@ -67,7 +67,7 @@ struct HandbookSectionView: View {
                 .padding(.horizontal, 18)
                 .padding(.top, 10)
                 .padding(.bottom, 24)
-                .clayReadable()
+                .folkReadable()
             }
         }
         .navigationBarHidden(true)
@@ -75,12 +75,12 @@ struct HandbookSectionView: View {
 
     @ViewBuilder
     private func itemCard(_ item: HandbookItem) -> some View {
-        ClayCard(padding: 14) {
+        FolkCard(padding: 14) {
             VStack(alignment: .leading, spacing: 10) {
                 if let art = item.artName {
-                    CornerArt(name: art)
+                    FolkArt(name: art)
                         .scaledToFill()
-                        .frame(height: ClayLayout.isPad(hSize, vSize) ? 190 : 130)
+                        .frame(height: FolkLayout.isPad(hSize, vSize) ? 190 : 130)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(14)
@@ -91,7 +91,7 @@ struct HandbookSectionView: View {
                             Circle().fill(Studio.terracotta.opacity(0.15))
                                 .frame(width: 30, height: 30)
                             Text("\(n)")
-                                .font(.clayBody(14, .bold))
+                                .font(.folkBody(14, .bold))
                                 .foregroundColor(Studio.terracotta)
                         }
                     }
@@ -113,12 +113,12 @@ struct HandbookSectionView: View {
                         }
                     }
                     Text(item.title)
-                        .font(.clayBody(15, .bold))
+                        .font(.folkBody(15, .bold))
                         .foregroundColor(Studio.ink)
                     Spacer()
                 }
                 Text(item.text)
-                    .font(.clayBody(13))
+                    .font(.folkBody(13))
                     .foregroundColor(Studio.ink.opacity(0.8))
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)

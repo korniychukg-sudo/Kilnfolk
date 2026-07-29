@@ -1,20 +1,20 @@
 import SwiftUI
 
-final class ClayStore: ObservableObject {
+final class FolkStore: ObservableObject {
     @Published var pots: [PotDesign] = []
     @Published var firingJob: KilnJob? = nil
     @Published var draft: WheelDraft? = nil
     @Published var onboardingSeen = false
-    @Published var stats = ClayStats()
+    @Published var stats = FolkStats()
 
-    private let potsKey = "corner.pots.v1"
-    private let kilnKey = "corner.kiln.v1"
-    private let draftKey = "corner.draft.v1"
-    private let metaKey = "corner.meta.v1"
+    private let potsKey = "kilnfolk.pots.v1"
+    private let kilnKey = "kilnfolk.kiln.v1"
+    private let draftKey = "kilnfolk.draft.v1"
+    private let metaKey = "kilnfolk.meta.v1"
 
     private struct MetaBlob: Codable {
         var onboardingSeen = false
-        var stats = ClayStats()
+        var stats = FolkStats()
     }
 
     init() {
@@ -151,7 +151,7 @@ final class ClayStore: ObservableObject {
         pots = []
         firingJob = nil
         draft = nil
-        stats = ClayStats()
+        stats = FolkStats()
         UserDefaults.standard.removeObject(forKey: potsKey)
         UserDefaults.standard.removeObject(forKey: kilnKey)
         UserDefaults.standard.removeObject(forKey: draftKey)

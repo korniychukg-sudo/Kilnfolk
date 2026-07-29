@@ -16,7 +16,7 @@ enum WheelTool: String, CaseIterable, Identifiable {
         }
     }
 
-    var icon: ClayIconKind {
+    var icon: FolkIconKind {
         switch self {
         case .hands: return .hand
         case .sponge: return .sponge
@@ -82,7 +82,7 @@ struct SlipParticle: Identifiable {
 }
 
 struct WheelStudioView: View {
-    @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var store: FolkStore
     @EnvironmentObject var journey: JourneyStore
     @Environment(\.horizontalSizeClass) private var hSize
     @Environment(\.verticalSizeClass) private var vSize
@@ -142,7 +142,7 @@ struct WheelStudioView: View {
                             controls(stacked: true)
                         }
                         .padding(16)
-                        .frame(width: min(ClayLayout.isPad(hSize, vSize) ? 400 : 330,
+                        .frame(width: min(FolkLayout.isPad(hSize, vSize) ? 400 : 330,
                                           geo.size.width * 0.42))
                     }
                 } else {
@@ -155,7 +155,7 @@ struct WheelStudioView: View {
                         controls(stacked: false)
                             .padding(.horizontal, 18)
                             .padding(.bottom, 10)
-                            .clayReadable()
+                            .folkReadable()
                     }
                 }
             }
@@ -191,22 +191,22 @@ struct WheelStudioView: View {
         HStack(alignment: .center, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("The Wheel")
-                    .font(.clayTitle(26))
+                    .font(.folkTitle(26))
                     .foregroundColor(Studio.ink)
                 Text("Shape it with your finger")
-                    .font(.clayBody(13))
+                    .font(.folkBody(13))
                     .foregroundColor(Studio.inkSoft)
             }
             Spacer()
             Button(action: undo) {
-                ClayIcon(kind: .undo, size: 21, color: undoStack.isEmpty ? Studio.inkFaint : Studio.ink)
+                FolkIcon(kind: .undo, size: 21, color: undoStack.isEmpty ? Studio.inkFaint : Studio.ink)
                     .padding(9)
                     .background(Circle().fill(Studio.card))
             }
             .buttonStyle(PlainButtonStyle())
             .disabled(undoStack.isEmpty)
             Button(action: { showResetConfirm = true }) {
-                ClayIcon(kind: .reset, size: 21, color: Studio.ink)
+                FolkIcon(kind: .reset, size: 21, color: Studio.ink)
                     .padding(9)
                     .background(Circle().fill(Studio.card))
             }
@@ -220,7 +220,7 @@ struct WheelStudioView: View {
         GeometryReader { geo in
             let layout = sceneLayout(geo.size)
             ZStack {
-                CornerArt(name: "studio_backdrop")
+                FolkArt(name: "studio_backdrop")
                     .scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height)
                     .clipped()
@@ -250,7 +250,7 @@ struct WheelStudioView: View {
                     HStack {
                         Spacer()
                         Text("H \(PotMeasure.heightCM(heightScale)) cm · W \(PotMeasure.widthCM(profile)) cm")
-                            .font(.clayBody(11, .bold))
+                            .font(.folkBody(11, .bold))
                             .foregroundColor(Studio.inkSoft)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
@@ -263,7 +263,7 @@ struct WheelStudioView: View {
 
                 if stoppedHint {
                     Text("Press a pedal below to spin the wheel")
-                        .font(.clayBody(13, .bold))
+                        .font(.folkBody(13, .bold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
@@ -348,22 +348,22 @@ struct WheelStudioView: View {
         return HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(form.name)
-                    .font(.clayBody(13, .bold))
+                    .font(.folkBody(13, .bold))
                     .foregroundColor(Studio.ink)
                 HStack(spacing: 3) {
                     ForEach(0..<3, id: \.self) { i in
-                        ClayIcon(kind: i < stars ? .starFill : .star, size: 11,
+                        FolkIcon(kind: i < stars ? .starFill : .star, size: 11,
                                  color: i < stars ? Studio.honey : Studio.inkFaint)
                     }
                 }
             }
             Text("\(Int((fit * 100).rounded()))%")
-                .font(.clayTitle(19))
+                .font(.folkTitle(19))
                 .foregroundColor(fit >= 0.78 ? Studio.sage : Studio.terracotta)
                 .frame(minWidth: 46)
             Button(action: { ghostOn.toggle() }) {
                 Text(ghostOn ? "Hide guide" : "Show guide")
-                    .font(.clayBody(11, .bold))
+                    .font(.folkBody(11, .bold))
                     .foregroundColor(Studio.denim)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 6)
@@ -373,7 +373,7 @@ struct WheelStudioView: View {
             Button(action: {
                 journey.activeFormID = nil
             }) {
-                ClayIcon(kind: .close, size: 13, color: Studio.inkSoft)
+                FolkIcon(kind: .close, size: 13, color: Studio.inkSoft)
                     .padding(7)
                     .background(Circle().fill(Studio.linen))
             }
@@ -392,21 +392,21 @@ struct WheelStudioView: View {
             if !done { journey.activeFormID = form.id }
         }) {
             HStack(spacing: 7) {
-                ClayIcon(kind: done ? .check : .sparkle, size: 14,
+                FolkIcon(kind: done ? .check : .sparkle, size: 14,
                          color: done ? Studio.sage : Studio.honey)
                 Text(done ? "Form of the day done!" : "Form of the day: \(form.name)")
-                    .font(.clayBody(12, .bold))
+                    .font(.folkBody(12, .bold))
                     .foregroundColor(Studio.ink)
                 if journey.state.dailyStreak > 0 {
                     HStack(spacing: 3) {
-                        ClayIcon(kind: .flame, size: 12, color: Studio.ember)
+                        FolkIcon(kind: .flame, size: 12, color: Studio.ember)
                         Text("\(journey.state.dailyStreak)")
-                            .font(.clayBody(12, .bold))
+                            .font(.folkBody(12, .bold))
                             .foregroundColor(Studio.ember)
                     }
                 }
                 if !done {
-                    ClayIcon(kind: .chevronRight, size: 11, color: Studio.inkFaint)
+                    FolkIcon(kind: .chevronRight, size: 11, color: Studio.inkFaint)
                 }
             }
             .padding(.horizontal, 12)
@@ -561,7 +561,7 @@ struct WheelStudioView: View {
     private func controls(stacked: Bool) -> some View {
         VStack(spacing: 12) {
             Text(tool.hint)
-                .font(.clayBody(12))
+                .font(.folkBody(12))
                 .foregroundColor(Studio.inkSoft)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
@@ -583,7 +583,7 @@ struct WheelStudioView: View {
                 }
             }
 
-            ClayPrimaryButton(title: shapedEnough ? "Glaze this piece" : "Shape the clay first…",
+            FolkPrimaryButton(title: shapedEnough ? "Glaze this piece" : "Shape the clay first…",
                               enabled: shapedEnough) {
                 showGlazeStudio = true
             }
@@ -597,9 +597,9 @@ struct WheelStudioView: View {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }) {
             VStack(spacing: 4) {
-                ClayIcon(kind: item.icon, size: 22, color: selected ? .white : Studio.ink)
+                FolkIcon(kind: item.icon, size: 22, color: selected ? .white : Studio.ink)
                 Text(item.label)
-                    .font(.clayBody(11, .bold))
+                    .font(.folkBody(11, .bold))
                     .foregroundColor(selected ? .white : Studio.inkSoft)
             }
             .frame(maxWidth: .infinity)
@@ -620,7 +620,7 @@ struct WheelStudioView: View {
                     .frame(width: 18, height: 18)
                     .overlay(Circle().stroke(Studio.ink.opacity(0.2), lineWidth: 1))
                 Text(clay.displayName)
-                    .font(.clayBody(13, .bold))
+                    .font(.folkBody(13, .bold))
                     .foregroundColor(Studio.ink)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -638,7 +638,7 @@ struct WheelStudioView: View {
                 let selected = wheelSpeed == speed
                 Button(action: { setSpeed(speed) }) {
                     Text(speed.label)
-                        .font(.clayBody(13, .bold))
+                        .font(.folkBody(13, .bold))
                         .foregroundColor(selected ? .white : Studio.inkSoft)
                         .padding(.horizontal, 13)
                         .padding(.vertical, 8)
@@ -700,11 +700,11 @@ struct WheelStudioView: View {
             VStack(spacing: 14) {
                 HStack {
                     Text("Choose your clay")
-                        .font(.clayTitle(22))
+                        .font(.folkTitle(22))
                         .foregroundColor(Studio.ink)
                     Spacer()
                     Button(action: { showClayPicker = false }) {
-                        ClayIcon(kind: .close, size: 18, color: Studio.ink)
+                        FolkIcon(kind: .close, size: 18, color: Studio.ink)
                             .padding(8)
                             .background(Circle().fill(Studio.card))
                     }
@@ -722,7 +722,7 @@ struct WheelStudioView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .clayReadable()
+            .folkReadable()
         }
     }
 
@@ -748,19 +748,19 @@ struct WheelStudioView: View {
                 .opacity(unlocked ? 1 : 0.35)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(kind.displayName)
-                        .font(.clayBody(16, .bold))
+                        .font(.folkBody(16, .bold))
                         .foregroundColor(unlocked ? Studio.ink : Studio.inkSoft)
                     Text(unlocked ? kind.blurb : "Unlocks at rank \(unlockLevel) · \(rankName). Keep firing pieces to get there.")
-                        .font(.clayBody(12))
+                        .font(.folkBody(12))
                         .foregroundColor(Studio.inkSoft)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
                 if selected {
-                    ClayIcon(kind: .check, size: 18, color: Studio.sage)
+                    FolkIcon(kind: .check, size: 18, color: Studio.sage)
                 } else if !unlocked {
-                    ClayChip(text: "Rank \(unlockLevel)", tint: Studio.denim)
+                    FolkChip(text: "Rank \(unlockLevel)", tint: Studio.denim)
                 }
             }
             .padding(14)

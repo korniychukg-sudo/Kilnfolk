@@ -1,4 +1,4 @@
-# Clay Corner v2 — "Potter's Journey" Design
+# Kilnfolk v2 — "Potter's Journey" Design
 
 Date: 2026-07-24. Version stays 1.0 (build 1) per delivery rule.
 
@@ -50,7 +50,7 @@ The handbook stops being the centerpiece and becomes the "Lore" shelf of the Jou
 ### B. Progression (XP, ranks, unlocks)
 
 - New `JourneyStore` (ObservableObject) with its own UserDefaults key
-  `corner.journey.v1` — zero migration risk for v1 pots; tolerant decode throughout.
+  `kilnfolk.journey.v1` — zero migration risk for v1 pots; tolerant decode throughout.
 - XP on every reveal: 20 base + 15 × stars (challenge) + 10 first-use of each glaze +
   10 first-use of each clay + 15 daily-form bonus.
 - 12 ranks with names (New Hands → Master Potter), thresholds 0…1200.
@@ -101,7 +101,7 @@ swatches). Multiple unlocks stack vertically.
   glazesUsed [String], claysUsed [String], crackleCount, badges [String: Date],
   dailyStreak, lastDailyKey, bankedTallPot/wideBowl flags derived at fire time.
 - Badge/unlock evaluation happens in one place: `JourneyStore.registerFiredPot(...)`
-  called from `ClayStore.collectFiredPot` result path in KilnView; returns a
+  called from `FolkStore.collectFiredPot` result path in KilnView; returns a
   `RevealSummary` (xp gained, breakdown, new rank?, unlocked items, new badges) the
   reveal sheet renders.
 
@@ -112,10 +112,10 @@ New files: `FormLibrary.swift` (forms + tiers + fit scoring), `JourneyStore.swif
 `ConfettiView.swift`. Modified: WheelStudioView (ghost overlay, fit meter, HUD,
 particles, challenge entry), GlazeStudioView (locked swatches), KilnView (reveal v2),
 GalleryView (cabinet, chips, dimensions), RootView (tab rename/icon, environment),
-ClayModels (pot optionals), MoreView, OnboardingView, art generator (4 new/updated
+FolkModels (pot optionals), MoreView, OnboardingView, art generator (4 new/updated
 images). Handbook views unchanged, re-hosted inside JourneyView.
 
-JourneyStore is injected as a second `@EnvironmentObject` alongside ClayStore.
+JourneyStore is injected as a second `@EnvironmentObject` alongside FolkStore.
 Challenge targeting is a small `@Published var activeFormID: String?` on JourneyStore
 so Journey → Studio communication needs no new plumbing.
 

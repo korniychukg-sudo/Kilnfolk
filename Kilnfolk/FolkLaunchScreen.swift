@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ClayLaunchScreen: View {
+struct FolkLaunchScreen: View {
     @State private var spin = false
 
     var body: some View {
@@ -26,11 +26,11 @@ struct ClayLaunchScreen: View {
                 }
 
                 VStack(spacing: 6) {
-                    Text("Clay Corner")
-                        .font(.clayTitle(30))
+                    Text("Kilnfolk")
+                        .font(.folkTitle(30))
                         .foregroundColor(Studio.ink)
                     Text("A tiny pottery studio")
-                        .font(.clayBody(15))
+                        .font(.folkBody(15))
                         .foregroundColor(Studio.inkSoft)
                 }
             }

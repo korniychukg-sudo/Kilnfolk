@@ -1,10 +1,10 @@
-# Clay Corner v2 — Potter's Journey Implementation Plan
+# Kilnfolk v2 — Potter's Journey Implementation Plan
 
-Spec: `../specs/2026-07-24-clay-corner-v2-journey-design.md`
+Spec: `../specs/2026-07-24-kilnfolk-v2-journey-design.md`
 
 ## Step 1 — Data layer
 
-1. `ClayModels.swift`: add `formID: String?` and `formStars: Int?` to `PotDesign`
+1. `FolkModels.swift`: add `formID: String?` and `formStars: Int?` to `PotDesign`
    (optionals — old blobs decode unchanged).
 2. New `FormLibrary.swift`:
    - `PotForm { id, name, tier (1-4), story, controls: [Double], targetHeight }`
@@ -14,7 +14,7 @@ Spec: `../specs/2026-07-24-clay-corner-v2-journey-design.md`
      (3★ ≥ 0.90, 2★ ≥ 0.78, 1★ ≥ 0.62).
    - `tierUnlocked(tier:totalStars:)` (4/10/18★ for tiers 2/3/4).
 3. New `JourneyStore.swift`:
-   - `JourneyState: Codable` per spec; key `corner.journey.v1`; tolerant decode.
+   - `JourneyState: Codable` per spec; key `kilnfolk.journey.v1`; tolerant decode.
    - Ranks table (12 names + thresholds 0,40,90,150,220,300,400,520,660,820,1000,1200).
    - `glazeUnlockLevel[id]`, `clayUnlockLevel[kind]`; `isGlazeUnlocked/isClayUnlocked`.
    - `@Published var activeFormID: String?` (challenge routing).

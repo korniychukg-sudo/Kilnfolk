@@ -7,7 +7,7 @@ struct KilnRevealData: Identifiable {
 }
 
 struct KilnView: View {
-    @EnvironmentObject var store: ClayStore
+    @EnvironmentObject var store: FolkStore
     @EnvironmentObject var journey: JourneyStore
     @Environment(\.horizontalSizeClass) private var hSize
     @Environment(\.verticalSizeClass) private var vSize
@@ -18,19 +18,19 @@ struct KilnView: View {
             Studio.cream.ignoresSafeArea()
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
-                    CornerArt(name: "kiln_banner")
+                    FolkArt(name: "kiln_banner")
                         .scaledToFill()
-                        .frame(height: ClayLayout.bannerHeight(hSize, vSize))
+                        .frame(height: FolkLayout.bannerHeight(hSize, vSize))
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .cornerRadius(22)
                         .overlay(
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("The Kiln")
-                                    .font(.clayTitle(26))
+                                    .font(.folkTitle(26))
                                     .foregroundColor(.white)
                                 Text("Cone 6 · patience required")
-                                    .font(.clayBody(13))
+                                    .font(.folkBody(13))
                                     .foregroundColor(.white.opacity(0.85))
                             }
                             .padding(14)
@@ -45,7 +45,7 @@ struct KilnView: View {
                     firingCard
 
                     if !store.kilnQueue.isEmpty {
-                        ClaySectionHeader(title: "Waiting to fire",
+                        FolkSectionHeader(title: "Waiting to fire",
                                           caption: "Pieces load automatically, one at a time")
                         ForEach(Array(store.kilnQueue.enumerated()), id: \.element.id) { index, pot in
                             queueRow(pot: pot, position: index + 1)
@@ -57,7 +57,7 @@ struct KilnView: View {
                 .padding(.horizontal, 18)
                 .padding(.top, 12)
                 .padding(.bottom, 24)
-                .clayReadable()
+                .folkReadable()
             }
         }
         .sheet(item: $reveal) { data in
@@ -73,31 +73,31 @@ struct KilnView: View {
             TimelineView(.periodic(from: .now, by: 0.5)) { timeline in
                 let progress = job.progress(at: timeline.date)
                 let done = job.isDone(at: timeline.date)
-                ClayCard {
+                FolkCard {
                     VStack(spacing: 14) {
                         HStack(spacing: 14) {
                             kilnWindow(pot: pot, progress: progress, done: done)
                                 .frame(width: 108, height: 128)
                             VStack(alignment: .leading, spacing: 7) {
                                 Text(pot.displayName)
-                                    .font(.clayBody(17, .bold))
+                                    .font(.folkBody(17, .bold))
                                     .foregroundColor(Studio.ink)
                                     .lineLimit(1)
                                 HStack(spacing: 6) {
-                                    ClayIcon(kind: .flame, size: 15, color: Studio.ember)
+                                    FolkIcon(kind: .flame, size: 15, color: Studio.ember)
                                     Text(done ? "Firing complete" : "Firing…")
-                                        .font(.clayBody(13, .bold))
+                                        .font(.folkBody(13, .bold))
                                         .foregroundColor(done ? Studio.sage : Studio.ember)
                                 }
                                 Text(temperatureText(progress: progress, done: done))
-                                    .font(.clayBody(13))
+                                    .font(.folkBody(13))
                                     .foregroundColor(Studio.inkSoft)
                                 progressBar(progress: progress)
                             }
                             Spacer(minLength: 0)
                         }
                         if done {
-                            ClayPrimaryButton(title: "Open the kiln", tint: Studio.ember) {
+                            FolkPrimaryButton(title: "Open the kiln", tint: Studio.ember) {
                                 if let fresh = store.collectFiredPot() {
                                     let summary = journey.registerFiredPot(
                                         fresh,
@@ -112,17 +112,17 @@ struct KilnView: View {
                 }
             }
         } else if store.kilnQueue.isEmpty {
-            ClayCard {
+            FolkCard {
                 VStack(spacing: 10) {
-                    CornerArt(name: "kiln_cold")
+                    FolkArt(name: "kiln_cold")
                         .scaledToFit()
                         .frame(height: 130)
                         .cornerRadius(16)
                     Text("The kiln is cold")
-                        .font(.clayBody(16, .bold))
+                        .font(.folkBody(16, .bold))
                         .foregroundColor(Studio.ink)
                     Text("Throw a pot in the Studio, glaze it, and it will show up here ready to fire.")
-                        .font(.clayBody(13))
+                        .font(.folkBody(13))
                         .foregroundColor(Studio.inkSoft)
                         .multilineTextAlignment(.center)
                 }
@@ -180,22 +180,22 @@ struct KilnView: View {
     // MARK: Queue
 
     private func queueRow(pot: PotDesign, position: Int) -> some View {
-        ClayCard(padding: 12) {
+        FolkCard(padding: 12) {
             HStack(spacing: 12) {
                 PotFigure(pot: pot, phase: Double(position), wet: false, showShadow: false)
                     .frame(width: 54, height: 64)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(pot.displayName)
-                        .font(.clayBody(15, .bold))
+                        .font(.folkBody(15, .bold))
                         .foregroundColor(Studio.ink)
                         .lineLimit(1)
                     Text(coatSummary(pot))
-                        .font(.clayBody(12))
+                        .font(.folkBody(12))
                         .foregroundColor(Studio.inkSoft)
                         .lineLimit(1)
                 }
                 Spacer()
-                ClayChip(text: "Waiting · #\(position)", tint: Studio.denim)
+                FolkChip(text: "Waiting · #\(position)", tint: Studio.denim)
             }
         }
     }
@@ -211,11 +211,11 @@ struct KilnView: View {
     }
 
     private var kilnNote: some View {
-        ClayCard(padding: 14) {
+        FolkCard(padding: 14) {
             HStack(alignment: .top, spacing: 12) {
-                ClayIcon(kind: .info, size: 20, color: Studio.denim)
+                FolkIcon(kind: .info, size: 20, color: Studio.denim)
                 Text("Real kilns fire for half a day. Ours takes half a minute — and about one piece in five comes out with a surprise crackle finish.")
-                    .font(.clayBody(13))
+                    .font(.folkBody(13))
                     .foregroundColor(Studio.inkSoft)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -238,7 +238,7 @@ struct KilnRevealSheet: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
                     Text("Fresh from the kiln")
-                        .font(.clayTitle(24))
+                        .font(.folkTitle(24))
                         .foregroundColor(Studio.ink)
                         .padding(.top, 24)
 
@@ -250,15 +250,15 @@ struct KilnRevealSheet: View {
 
                     VStack(spacing: 8) {
                         Text(pot.displayName)
-                            .font(.clayBody(18, .bold))
+                            .font(.folkBody(18, .bold))
                             .foregroundColor(Studio.ink)
                         HStack(spacing: 8) {
-                            ClayChip(text: pot.clay.displayName, tint: Studio.terracotta)
+                            FolkChip(text: pot.clay.displayName, tint: Studio.terracotta)
                             if let base = GlazeCatalog.recipe(pot.coat.baseGlazeID) {
-                                ClayChip(text: base.name, tint: Studio.denim)
+                                FolkChip(text: base.name, tint: Studio.denim)
                             }
                             if pot.crackle {
-                                ClayChip(text: "Crackle surprise!", tint: Studio.honey)
+                                FolkChip(text: "Crackle surprise!", tint: Studio.honey)
                             }
                         }
                     }
@@ -279,20 +279,20 @@ struct KilnRevealSheet: View {
 
                     if pot.crackle {
                         Text("The glaze shivered as it cooled and left a fine web of lines. Potters chase this on purpose.")
-                            .font(.clayBody(13))
+                            .font(.folkBody(13))
                             .foregroundColor(Studio.inkSoft)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 30)
                     }
 
-                    ClayPrimaryButton(title: "Place in the gallery", tint: Studio.sage) {
+                    FolkPrimaryButton(title: "Place in the gallery", tint: Studio.sage) {
                         onDone()
                     }
                     .padding(.top, 4)
                     .padding(.bottom, 24)
                 }
                 .padding(.horizontal, 22)
-                .clayReadable()
+                .folkReadable()
             }
 
             ConfettiBurst(seed: pot.artSeed)
@@ -311,22 +311,22 @@ struct KilnRevealSheet: View {
     }
 
     private func formResultCard(_ formName: String) -> some View {
-        ClayCard(padding: 14) {
+        FolkCard(padding: 14) {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(formName)
-                        .font(.clayBody(15, .bold))
+                        .font(.folkBody(15, .bold))
                         .foregroundColor(Studio.ink)
                     Text(summary.stars > 0
                          ? "Fit \(Int((summary.fit * 100).rounded()))% — the form holds!"
                          : "Fit \(Int((summary.fit * 100).rounded()))% — not quite this time. Throw it again!")
-                        .font(.clayBody(12))
+                        .font(.folkBody(12))
                         .foregroundColor(Studio.inkSoft)
                     if summary.dailyDone {
                         HStack(spacing: 4) {
-                            ClayIcon(kind: .flame, size: 12, color: Studio.ember)
+                            FolkIcon(kind: .flame, size: 12, color: Studio.ember)
                             Text("Form of the day · \(summary.dailyStreak)-day streak")
-                                .font(.clayBody(12, .bold))
+                                .font(.folkBody(12, .bold))
                                 .foregroundColor(Studio.ember)
                         }
                     }
@@ -334,7 +334,7 @@ struct KilnRevealSheet: View {
                 Spacer()
                 HStack(spacing: 3) {
                     ForEach(0..<3, id: \.self) { i in
-                        ClayIcon(kind: i < summary.stars ? .starFill : .star, size: 22,
+                        FolkIcon(kind: i < summary.stars ? .starFill : .star, size: 22,
                                  color: i < summary.stars ? Studio.honey : Studio.inkFaint)
                     }
                 }
@@ -343,16 +343,16 @@ struct KilnRevealSheet: View {
     }
 
     private var xpCard: some View {
-        ClayCard(padding: 14) {
+        FolkCard(padding: 14) {
             VStack(spacing: 8) {
                 ForEach(Array(summary.xpLines.enumerated()), id: \.offset) { i, line in
                     HStack {
                         Text(line.label)
-                            .font(.clayBody(13))
+                            .font(.folkBody(13))
                             .foregroundColor(Studio.inkSoft)
                         Spacer()
                         Text("+\(line.xp) XP")
-                            .font(.clayBody(13, .bold))
+                            .font(.folkBody(13, .bold))
                             .foregroundColor(Studio.sage)
                     }
                     .opacity(i < linesShown ? 1 : 0)
@@ -360,11 +360,11 @@ struct KilnRevealSheet: View {
                 Rectangle().fill(Studio.linen).frame(height: 1)
                 HStack {
                     Text("Journey")
-                        .font(.clayBody(14, .bold))
+                        .font(.folkBody(14, .bold))
                         .foregroundColor(Studio.ink)
                     Spacer()
                     Text("+\(summary.totalXP) XP")
-                        .font(.clayTitle(17))
+                        .font(.folkTitle(17))
                         .foregroundColor(Studio.terracotta)
                 }
             }
@@ -375,11 +375,11 @@ struct KilnRevealSheet: View {
         let rankName = JourneyStore.ranks.first(where: { $0.level == summary.newLevel })?.name ?? ""
         return VStack(spacing: 10) {
             HStack(spacing: 8) {
-                ClayIcon(kind: .sparkle, size: 18, color: .white)
+                FolkIcon(kind: .sparkle, size: 18, color: .white)
                 Text("Rank up! \(rankName)")
-                    .font(.clayBody(16, .bold))
+                    .font(.folkBody(16, .bold))
                     .foregroundColor(.white)
-                ClayIcon(kind: .sparkle, size: 18, color: .white)
+                FolkIcon(kind: .sparkle, size: 18, color: .white)
             }
             if !summary.unlockedGlazes.isEmpty || !summary.unlockedClays.isEmpty {
                 VStack(spacing: 6) {
@@ -388,7 +388,7 @@ struct KilnRevealSheet: View {
                             Circle().fill(glaze.fired.color).frame(width: 18, height: 18)
                                 .overlay(Circle().stroke(Color.white.opacity(0.7), lineWidth: 1))
                             Text("New glaze unlocked: \(glaze.name)")
-                                .font(.clayBody(13, .bold))
+                                .font(.folkBody(13, .bold))
                                 .foregroundColor(.white)
                             Spacer()
                         }
@@ -398,7 +398,7 @@ struct KilnRevealSheet: View {
                             Circle().fill(kind.wetTone.color).frame(width: 18, height: 18)
                                 .overlay(Circle().stroke(Color.white.opacity(0.7), lineWidth: 1))
                             Text("New clay unlocked: \(kind.displayName)")
-                                .font(.clayBody(13, .bold))
+                                .font(.folkBody(13, .bold))
                                 .foregroundColor(.white)
                             Spacer()
                         }
@@ -417,22 +417,22 @@ struct KilnRevealSheet: View {
     }
 
     private func badgeCard(_ badge: JourneyBadge) -> some View {
-        ClayCard(padding: 12) {
+        FolkCard(padding: 12) {
             HStack(spacing: 12) {
                 ZStack {
                     Circle().fill(Studio.honey.opacity(0.2)).frame(width: 44, height: 44)
                     Circle().stroke(Studio.honey, lineWidth: 2).frame(width: 44, height: 44)
-                    ClayIcon(kind: .starFill, size: 20, color: Studio.honey)
+                    FolkIcon(kind: .starFill, size: 20, color: Studio.honey)
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Award earned")
-                        .font(.clayBody(11, .bold))
+                        .font(.folkBody(11, .bold))
                         .foregroundColor(Studio.honey)
                     Text(badge.title)
-                        .font(.clayBody(15, .bold))
+                        .font(.folkBody(15, .bold))
                         .foregroundColor(Studio.ink)
                     Text(badge.hint)
-                        .font(.clayBody(12))
+                        .font(.folkBody(12))
                         .foregroundColor(Studio.inkSoft)
                 }
                 Spacer()

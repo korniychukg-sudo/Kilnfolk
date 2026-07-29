@@ -19,7 +19,7 @@ struct ConfettiBurst: View {
     }
 
     private var pieces: [Piece] {
-        var rng = ClayRandom(seed: seed)
+        var rng = FolkRandom(seed: seed)
         return (0..<46).map { _ in
             Piece(x0: rng.range(0.08, 0.92),
                   vx: rng.range(-40, 40),

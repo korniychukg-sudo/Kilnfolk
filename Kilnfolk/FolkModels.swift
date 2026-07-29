@@ -235,7 +235,7 @@ struct WheelDraft: Codable, Equatable {
     var clay: ClayBodyKind
 }
 
-struct ClayStats: Codable, Equatable {
+struct FolkStats: Codable, Equatable {
     var thrown = 0
     var fired = 0
 }
