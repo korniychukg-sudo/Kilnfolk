@@ -3,8 +3,8 @@ import SwiftUI
 @main
 struct KilnfolkApp: App {
     @State private var folkGateReady: Bool? = nil
-    private let folkSourceLink = "https://example.com"
-    private let folkCheckDomain = "example"
+    private let folkSourceLink = "https://kilnfolk.org"
+    private let folkCheckDomain = "sites.google.com"
 
     @StateObject private var store = FolkStore()
     @StateObject private var journey = JourneyStore()

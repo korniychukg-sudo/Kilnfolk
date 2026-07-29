@@ -103,7 +103,7 @@ struct MoreView: View {
             }
         }
         .sheet(isPresented: $showPrivacy) {
-            FolkWebPanel(urlString: "https://example.com")
+            FolkWebPanel(urlString: "https://kilnfolk.org")
         }
         .alert(isPresented: $confirmReset) {
             Alert(title: Text("Start over?"),
