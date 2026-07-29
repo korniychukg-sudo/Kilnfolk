@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		CC0000000000000000000101 /* KilnfolkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000001 /* KilnfolkApp.swift */; };
-		CC0000000000000000000102 /* FolkWebPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000002 /* FolkWebPanel.swift */; };
-		CC0000000000000000000103 /* FolkLaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000003 /* FolkLaunchScreen.swift */; };
 		CC0000000000000000000104 /* FolkTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000004 /* FolkTheme.swift */; };
 		CC0000000000000000000105 /* FolkIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000005 /* FolkIcons.swift */; };
 		CC0000000000000000000106 /* FolkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000006 /* FolkModels.swift */; };
@@ -35,8 +33,6 @@
 
 /* Begin PBXFileReference section */
 		CC0000000000000000000001 /* KilnfolkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KilnfolkApp.swift; sourceTree = "<group>"; };
-		CC0000000000000000000002 /* FolkWebPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolkWebPanel.swift; sourceTree = "<group>"; };
-		CC0000000000000000000003 /* FolkLaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolkLaunchScreen.swift; sourceTree = "<group>"; };
 		CC0000000000000000000004 /* FolkTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolkTheme.swift; sourceTree = "<group>"; };
 		CC0000000000000000000005 /* FolkIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolkIcons.swift; sourceTree = "<group>"; };
 		CC0000000000000000000006 /* FolkModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolkModels.swift; sourceTree = "<group>"; };
@@ -85,8 +81,6 @@
 			isa = PBXGroup;
 			children = (
 				CC0000000000000000000001 /* KilnfolkApp.swift */,
-				CC0000000000000000000002 /* FolkWebPanel.swift */,
-				CC0000000000000000000003 /* FolkLaunchScreen.swift */,
 				CC0000000000000000000004 /* FolkTheme.swift */,
 				CC0000000000000000000005 /* FolkIcons.swift */,
 				CC0000000000000000000006 /* FolkModels.swift */,
@@ -193,8 +187,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CC0000000000000000000101 /* KilnfolkApp.swift in Sources */,
-				CC0000000000000000000102 /* FolkWebPanel.swift in Sources */,
-				CC0000000000000000000103 /* FolkLaunchScreen.swift in Sources */,
 				CC0000000000000000000104 /* FolkTheme.swift in Sources */,
 				CC0000000000000000000105 /* FolkIcons.swift in Sources */,
 				CC0000000000000000000106 /* FolkModels.swift in Sources */,
