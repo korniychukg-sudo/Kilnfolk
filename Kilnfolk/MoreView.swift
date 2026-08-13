@@ -142,40 +142,18 @@ struct MoreView: View {
 
 private struct FolkPrivacyView: View {
     @Environment(\.presentationMode) private var presentationMode
+    private let policyLink = "https://sites.google.com/view/kilnfolkk/"
 
     var body: some View {
         NavigationView {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 18) {
-                    policySection("Overview",
-                                  "Kilnfolk works entirely on your device. The app does not require an account, does not connect to the internet and does not send any information anywhere.")
-                    policySection("What is stored",
-                                  "Your thrown pots, glazes, studio progress and settings are saved only in the app's private storage on this device. Nothing is uploaded or shared.")
-                    policySection("Analytics & tracking",
-                                  "Kilnfolk contains no analytics, no advertising and no third-party code that collects data. The app never tracks you across other apps or websites.")
-                    policySection("Your control",
-                                  "You can erase everything at any time with the reset option in More, or by deleting the app. Removing the app removes all of its data.")
-                }
-                .padding(18)
-            }
-            .background(Studio.cream.ignoresSafeArea())
-            .navigationBarTitle("Privacy Policy", displayMode: .inline)
-            .navigationBarItems(trailing: Button("Done") {
-                presentationMode.wrappedValue.dismiss()
-            })
+            KilnWebPanel(urlString: policyLink)
+                .edgesIgnoringSafeArea(.bottom)
+                .background(Studio.cream.ignoresSafeArea())
+                .navigationBarTitle("Privacy Policy", displayMode: .inline)
+                .navigationBarItems(trailing: Button("Done") {
+                    presentationMode.wrappedValue.dismiss()
+                })
         }
         .navigationViewStyle(StackNavigationViewStyle())
-    }
-
-    private func policySection(_ title: String, _ text: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.folkBody(15, .semibold))
-                .foregroundColor(Studio.ink)
-            Text(text)
-                .font(.folkBody(13))
-                .foregroundColor(Studio.inkSoft)
-                .fixedSize(horizontal: false, vertical: true)
-        }
     }
 }
