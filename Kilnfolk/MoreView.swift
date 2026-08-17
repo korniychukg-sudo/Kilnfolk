@@ -92,7 +92,7 @@ struct MoreView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
 
-                    Text("Kilnfolk 1.0 · made with mud and love")
+                    Text("Kilnfolk 1.1 · made with mud and love")
                         .font(.folkBody(12))
                         .foregroundColor(Studio.inkFaint)
                         .padding(.top, 6)

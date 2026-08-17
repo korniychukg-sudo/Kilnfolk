@@ -58,6 +58,7 @@ struct KilnfolkApp: App {
         let follower = KilnRedirectFollower(host: kilnCheckHost)
         let session = URLSession(configuration: .default, delegate: follower, delegateQueue: nil)
         session.dataTask(with: request) { _, response, error in
+            session.finishTasksAndInvalidate()
             DispatchQueue.main.async {
                 if follower.matchedHost {
                     kilnGateReady = false
